@@ -6,99 +6,47 @@
 <meta name="theme-color" content="#c90000">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <title>Guest Rewards Spinwheel App</title>
-<style>
-html,body{margin:0;min-height:100%;background:#f6f6f8;font-family:Arial,Helvetica,sans-serif}.boot{min-height:100vh;display:grid;place-items:center;text-align:center;color:#222}.boot b{display:block;font-size:1.15rem}.boot span{display:block;margin-top:8px;color:#777;font-size:.85rem}.loader{width:50px;height:50px;margin:0 auto 16px;border-radius:50%;border:5px solid #eee;border-top-color:#c90000;animation:s .8s linear infinite}@keyframes s{to{transform:rotate(360deg)}}
-</style>
+<style>html,body{margin:0;min-height:100%;background:#f6f6f8;font-family:Arial,Helvetica,sans-serif}.boot{min-height:100vh;display:grid;place-items:center;text-align:center;color:#222}.boot b{display:block;font-size:1.15rem}.boot span{display:block;margin-top:8px;color:#777;font-size:.85rem}.loader{width:50px;height:50px;margin:0 auto 16px;border-radius:50%;border:5px solid #eee;border-top-color:#c90000;animation:s .8s linear infinite}@keyframes s{to{transform:rotate(360deg)}}</style>
 </head>
 <body>
 <div class="boot"><div><div class="loader"></div><b>Guest Rewards</b><span>Loading live draw…</span></div></div>
 <script>
 (async()=>{
-  const BASE='https://raw.githubusercontent.com/KingAmada/shortletreward/f60cbeb6bce9764014e7ae84b8ee9a07c8081915/index.html';
-  try{
-    let text=await (await fetch(BASE,{cache:'no-store'})).text();
+ const WRAPPER='https://raw.githubusercontent.com/KingAmada/shortletreward/07934fd6ba4b0e59159db740c8b5648e5b20b0cb/index.html';
+ try{
+  let source=await (await fetch(WRAPPER,{cache:'no-store'})).text();
+  const patch=String.raw`
+    /* v13 */
+    text=text.replace('<div class="kicker">Public Guest Viewing Page</div>','');
+    text=text.replace("byId('winnerName').textContent = mask(winner.fullName);","byId('winnerName').textContent = compactApartment(winner.apartment)+' · '+mask(winner.fullName);");
+    text=text.replace("winner:{name:mask(winner.fullName),prize}","winner:{name:compactApartment(winner.apartment)+' · '+mask(winner.fullName),apartment:winner.apartment,prize}");
 
-    text=text.replace('<meta name="theme-color" content="#c90000">\n<title>Guest Rewards Spinwheel App</title>','<meta name="theme-color" content="#c90000">\n<link rel="icon" type="image/svg+xml" href="./favicon.svg">\n<link rel="apple-touch-icon" href="./favicon.svg">\n<title>Guest Rewards Spinwheel App</title>');
+    /* Prevent a late idle write from overwriting the next spin. */
+    text=text.replace("render(); publishLiveState({status:'idle',spinPlan:null});","render();");
 
-    text=text.replace("const PRIZES = ['₦1,000,000','₦100,000','₦100,000','₦100,000','₦50,000','₦50,000','₦50,000','₦50,000'];","const PRIZES = ['₦50,000','₦50,000','₦50,000','₦50,000','₦100,000','₦100,000','₦100,000','₦1,000,000'];");
-    text=text.replace('<div class="prizeRow"><div class="prizeAmount">₦1,000,000</div><div class="prizeMeta">1 Winner</div></div>\n          <div class="prizeRow"><div class="prizeAmount">₦100,000</div><div class="prizeMeta">3 Winners</div></div>\n          <div class="prizeRow"><div class="prizeAmount">₦50,000</div><div class="prizeMeta">4 Winners</div></div>','<div class="prizeRow"><div class="prizeAmount">₦50,000</div><div class="prizeMeta">4 Winners</div></div>\n          <div class="prizeRow"><div class="prizeAmount">₦100,000</div><div class="prizeMeta">3 Winners</div></div>\n          <div class="prizeRow"><div class="prizeAmount">₦1,000,000</div><div class="prizeMeta">1 Winner</div></div>');
+    /* Publish the spin plan first, then start everyone from the same timestamp. */
+    text=text.replace('function spinForWinner(){','async function spinForWinner(){');
+    text=text.replace("const start=performance.now(), rotor=byId('mainRotor'),publicRotor=byId('watchRotor');","let start=0; const rotor=byId('mainRotor'),publicRotor=byId('watchRotor');");
+    text=text.replace("startAt:Date.now(),startAngle,totalDelta,TA,TC,TD,tickets:publicTickets(),prize:PRIZES[state.results.length]","startAt:Date.now()+1200,startAngle,totalDelta,TA,TC,TD,tickets:publicTickets(),prize:PRIZES[state.results.length]");
+    text=text.replace("publishLiveState(remoteLiveState);\n    startSpinSound();","await publishLiveState(remoteLiveState);\n    const syncWait=Math.max(0,spinPlan.startAt-Date.now());if(syncWait)await new Promise(r=>setTimeout(r,syncWait));start=performance.now();\n    startSpinSound();");
 
-    text=text.replace('<div class="hub">Guest<br><b>Rewards</b></div>','<div class="hub wheelHub homeHub"><span class="hubTop">GUEST</span><b>REWARDS</b><small>SPIN</small></div>');
-    text=text.replace('<div class="hub">Live<br><b>Draw</b><small id="watchHubSlots">0 slots</small></div>','<div class="hub wheelHub liveHub"><span class="hubTop"><i class="hubDot"></i>LIVE</span><b>DRAW</b><small id="watchHubSlots">25 APARTMENTS</small></div>');
-    text=text.replace('<div class="hub">Guest<br><b>Draw</b><small id="hubSlots">0 slots</small></div>','<div class="hub wheelHub adminHub"><span class="hubTop">OFFICIAL</span><b>DRAW</b><small id="hubSlots">0 SLOTS</small></div>');
+    /* Realtime is primary; polling remains only as a fallback. */
+    text=text.replace("setInterval(fetchLiveState,500);","window.__raffleApplyLiveState=applyRemoteLiveState;\n  setInterval(fetchLiveState,2500);");
 
-    /* Privacy: wheel/public pages never expose full guest names. */
-    text=text.replace("function mask(name){ let p=String(name).trim().split(/\\s+/).filter(Boolean); if(p.length<2) return p[0]||'Guest'; return p[0]+' '+p[p.length-1][0]+'.'; }","function mask(name){const first=(String(name||'').trim().split(/\\s+/)[0]||'Guest');if(first.length===1)return first.toUpperCase()+'***';return first[0].toUpperCase()+'***'+first[first.length-1].toUpperCase();}\n  function compactApartment(a){a=String(a||'').trim();if(!a)return 'Apartment';return a.replace(/(\\d+) Bedroom Apartment — Unit (\\d+)/i,'$1BR U$2').replace(/Studio Apartment — Unit (\\d+)/i,'Studio U$1').replace(/Apartment — Unit /i,'Apt U');}");
-    text=text.replace("tickets.push({entryId:x.id,label:x.fullName,location:x.location,slot:placed,total:chosen.weight,days:x.days});","tickets.push({entryId:x.id,label:x.fullName,apartment:x.apartment,location:x.location,slot:placed,total:chosen.weight,days:x.days});");
-    text=text.replace("return state.results.map(w=>({id:w.id,name:mask(w.fullName),fullName:w.fullName,prize:w.prize,location:w.location,days:w.days}));","return state.results.map(w=>({id:w.id,name:compactApartment(w.apartment)+' · '+mask(w.fullName),prize:w.prize,location:w.location,apartment:w.apartment,days:w.days}));");
-    text=text.replace("return buildTickets().map(t=>({entryId:t.entryId,label:t.label,location:t.location,days:t.days,slot:t.slot}));","return buildTickets().map(t=>({entryId:t.entryId,label:mask(t.label),masked:true,apartment:t.apartment,location:t.location,days:t.days,slot:t.slot}));");
-    text=text.replace("function shortLabel(name){\n    const first = String(name).trim().split(/\\s+/)[0] || 'Guest';\n    return first.length>10 ? first.slice(0,10) : first;\n  }","function shortLabel(name){return mask(name);}");
-    text=text.replace("let label=mask(t.label);if(label.length>16)label=label.slice(0,15)+'…';","const guest=t.masked?t.label:mask(t.label);let label=t.placeholder?t.label:(t.apartment?compactApartment(t.apartment)+' · '+guest:guest);if(label.length>24)label=label.slice(0,23)+'…';");
-    text=text.replace("<b>${esc(mask(w.fullName))}</b>","<b>${esc(compactApartment(w.apartment)+' · '+mask(w.fullName))}</b>");
+    /* Mobile live splash always includes apartment + masked guest name. */
+    text=text.replace("const $=id=>document.getElementById(id);\n let lastSig='';","const $=id=>document.getElementById(id);\n const compactApt=a=>String(a||'').replace(/(\\d+) Bedroom Apartment — Unit (\\d+)/i,'$1BR U$2').replace(/Studio Apartment — Unit (\\d+)/i,'Studio U$1').replace(/Apartment — Unit /i,'Apt U');\n let lastSig='';");
+    text=text.replace("$('lwName').textContent=w.name||w.fullName||'Guest';","const baseName=w.name||w.fullName||'Guest';$('lwName').textContent=baseName.includes('·')?baseName:((w.apartment?compactApt(w.apartment)+' · ':'')+baseName);");
+    text=text.replace("$('lwClose').onclick=()=>$('liveWinnerOverlayV12').classList.remove('show');","window.__raffleShowLiveWinner=show;\n $('lwClose').onclick=()=>$('liveWinnerOverlayV12').classList.remove('show');");
 
-    const extraCSS=`
-<style>
-#phaseText,#livePhaseText{display:none!important}
-#enterScreen .formCard{width:min(100%,1040px);margin:0 auto;padding:22px 24px}
-#enterScreen .formTitle{font-size:1.45rem;letter-spacing:-.025em}
-#enterScreen .fields{gap:14px 16px!important}
-@media(min-width:900px){
- #enterScreen .fields{grid-template-columns:repeat(4,minmax(0,1fr))!important}
- #enterScreen .field:nth-child(1){grid-column:span 2}
- #entryForm{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;align-items:start}
- #entryForm .fields{grid-column:1/-1}
- #entryForm #derived{grid-column:1;margin-top:0!important}
- #entryForm .check{grid-column:2;margin-top:0!important;min-height:100%;align-items:center}
- #entryForm>.ctaRow{grid-column:1;margin-top:0!important}
- #entryForm>.small{grid-column:2;margin-top:0!important;align-self:center}
- #entryForm>.success{grid-column:1/-1}
-}
-@media(min-width:560px) and (max-width:899px){#enterScreen .fields{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
-.hub.wheelHub{position:absolute;z-index:6;width:96px;height:96px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;text-align:center;background:radial-gradient(circle at 35% 25%,#fff4a7 0%,#e6ab11 24%,#8d5600 53%,#17120a 78%,#070707 100%);border:3px solid #fff7d4;color:#fff;box-shadow:0 10px 24px rgba(0,0,0,.56),inset 0 0 0 2px rgba(255,206,79,.45),inset 0 0 18px rgba(255,220,114,.18);overflow:hidden}.hub.wheelHub:before{content:"";position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(255,239,180,.55);box-shadow:inset 0 0 12px rgba(0,0,0,.35);pointer-events:none}.hub.wheelHub>*{position:relative;z-index:2}.hubTop{display:flex;align-items:center;justify-content:center;gap:4px;color:#fff0a5;font-size:.49rem;font-weight:950;letter-spacing:.15em;line-height:1;text-shadow:0 1px 2px #000}.hub.wheelHub b{display:block;margin:2px 0 0;font:950 .98rem/.9 Impact,"Arial Black",sans-serif;letter-spacing:.045em;color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.75)}.hub.wheelHub small{display:block;max-width:78px;margin-top:5px;padding:3px 7px;border-radius:999px;background:rgba(0,0,0,.36);border:1px solid rgba(255,239,174,.38);color:#fff7d1;font-size:.47rem;font-weight:900;letter-spacing:.045em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hubDot{width:5px;height:5px;border-radius:50%;background:#43ee90;box-shadow:0 0 8px rgba(67,238,144,.9)}
-#liveWinnerOverlayV12{position:fixed;inset:0;z-index:9999;display:none;place-items:center;padding:20px}#liveWinnerOverlayV12.show{display:grid}#liveWinnerOverlayV12 .lwScrim{position:absolute;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(9px)}#liveWinnerOverlayV12 .lwCard{position:relative;z-index:2;width:min(390px,100%);overflow:hidden;border-radius:30px;padding:28px 22px;text-align:center;background:linear-gradient(145deg,#fff,#fff8e8);border:2px solid #efb92d;box-shadow:0 30px 90px rgba(0,0,0,.42);animation:lwIn .45s cubic-bezier(.2,1.4,.3,1)}#liveWinnerOverlayV12 .lwTop{color:#b87900;font-size:.72rem;font-weight:950;letter-spacing:.15em;text-transform:uppercase}#liveWinnerOverlayV12 h2{margin:8px 0 0;font-size:2.2rem;letter-spacing:-.05em}#liveWinnerOverlayV12 .lwName{margin-top:14px;color:#c90000;font-size:1.45rem;font-weight:1000}#liveWinnerOverlayV12 .lwPrize{margin-top:7px;font:900 2.25rem Georgia,serif;color:#111}#liveWinnerOverlayV12 p{margin:12px auto 0;max-width:310px;color:#666;line-height:1.55}#liveWinnerOverlayV12 button{margin-top:18px;border:0;border-radius:16px;padding:13px 20px;background:linear-gradient(145deg,#ffd967,#d69400);color:#111;font-weight:950;cursor:pointer;box-shadow:0 12px 28px rgba(204,143,0,.28)}#liveWinnerOverlayV12 .lwConfetti{pointer-events:none;position:absolute;inset:0;overflow:hidden}#liveWinnerOverlayV12 .lwConfetti i{position:absolute;top:-24px;width:10px;height:18px;border-radius:3px;animation:lwFall 2.6s linear forwards}@keyframes lwIn{from{opacity:0;transform:scale(.7) rotate(-3deg)}to{opacity:1;transform:scale(1)}}@keyframes lwFall{to{transform:translateY(110vh) rotate(720deg);opacity:1}}
-</style>`;
-    text=text.replace('</head>',extraCSS+'</head>');
-
-    const liveOverlay=`
-<div id="liveWinnerOverlayV12">
- <div class="lwScrim"></div>
- <div class="lwCard">
-  <div class="lwConfetti" id="lwConfetti"></div>
-  <div class="lwTop">Live Winner</div>
-  <h2>Congratulations!</h2>
-  <div class="lwName" id="lwName">Guest</div>
-  <div class="lwPrize" id="lwPrize">₦0</div>
-  <p>We will reach out to you for details of where to transfer the funds.</p>
-  <button id="lwClose">Back to Live Draw</button>
- </div>
-</div>`;
-
-    const livePatch=`
-<script>
-(()=>{
- const SUPABASE_URL='https://rwvngisohnflfofikspy.supabase.co';
- const SUPABASE_KEY='sb_publishable_V3B4qEnO8hPcHofizy8zoA_TDANaLlx';
- let lastSig='';
- const $=id=>document.getElementById(id);
- function confetti(){const box=$('lwConfetti');if(!box)return;box.innerHTML='';const c=['#c90000','#f0bc33','#111','#fff','#ff7777'];for(let i=0;i<90;i++){const p=document.createElement('i');p.style.left=(Math.random()*100)+'%';p.style.background=c[i%c.length];p.style.animationDelay=(Math.random()*.3)+'s';p.style.animationDuration=(1.8+Math.random()*1.4)+'s';box.appendChild(p)}}
- function fanfare(){try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const a=new A();[523,659,784,1047].forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,a.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.18,a.currentTime+i*.12+.02);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+i*.12+.38);o.connect(g);g.connect(a.destination);o.start(a.currentTime+i*.12);o.stop(a.currentTime+i*.12+.42)})}catch(e){}}
- function show(w){if(!$('watchScreen')||!$('watchScreen').classList.contains('active'))return;$('lwName').textContent=w.name||'Guest';$('lwPrize').textContent=w.prize||'Prize';$('liveWinnerOverlayV12').classList.add('show');confetti();fanfare()}
- $('lwClose').onclick=()=>$('liveWinnerOverlayV12').classList.remove('show');
- async function poll(){try{const r=await fetch(SUPABASE_URL+'/rest/v1/guest_raffle_live?id=eq.main&select=state',{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY},cache:'no-store'});if(!r.ok)return;const rows=await r.json(),s=rows&&rows[0]&&rows[0].state;if(!s)return;if(s.status==='spinning'){$('liveWinnerOverlayV12').classList.remove('show');return}if(s.status==='winner'&&Array.isArray(s.winners)&&s.winners.length){const w=s.winners[s.winners.length-1],sig=(w.id||w.name||'guest')+'|'+(w.prize||'')+'|'+s.winners.length;if(sig!==lastSig){lastSig=sig;show(w)}}}catch(e){}}
- poll();setInterval(poll,350);
-})();
-<\/script>`;
-    text=text.replace('</body>',liveOverlay+livePatch+'</body>');
-    text=text.replace("byId('watchHubSlots').textContent=realTickets.length?`${realTickets.length} slot${realTickets.length===1?'':'s'}`:'25 apartments';","byId('watchHubSlots').textContent=realTickets.length?`${realTickets.length} SLOT${realTickets.length===1?'':'S'}`:'25 APARTMENTS';");
-    text=text.replace("byId('hubSlots').textContent = `${tickets.length} slot${tickets.length===1?'':'s'}`;","byId('hubSlots').textContent = `${tickets.length} SLOT${tickets.length===1?'':'S'}`;");
-
-    document.open('text/html','replace');
-    document.write(text);
-    document.close();
-  }catch(err){
-    document.body.innerHTML='<div class="boot"><div><b>Unable to load Guest Rewards</b><span>Please refresh the page.</span></div></div>';
-    console.error(err);
-  }
+    text=text.replace('</head>','<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\\/script></head>');
+    const fastRealtime='<script>(()=>{const U="https://rwvngisohnflfofikspy.supabase.co",K="sb_publishable_V3B4qEnO8hPcHofizy8zoA_TDANaLlx";let W="";function A(s){if(!s)return;if(window.__raffleApplyLiveState)window.__raffleApplyLiveState(s);if(s.status==="winner"&&Array.isArray(s.winners)&&s.winners.length){const w=s.winners[s.winners.length-1],q=(w.id||w.name||"guest")+"|"+(w.prize||"")+"|"+s.winners.length;if(q!==W){W=q;if(window.__raffleShowLiveWinner)window.__raffleShowLiveWinner(w)}}}async function I(){try{const r=await fetch(U+"/rest/v1/guest_raffle_live?id=eq.main&select=state",{headers:{apikey:K,Authorization:"Bearer "+K},cache:"no-store"}),x=await r.json();A(x&&x[0]&&x[0].state)}catch(e){}}function C(){if(!window.supabase||!window.supabase.createClient){setTimeout(C,80);return}const c=window.supabase.createClient(U,K,{auth:{persistSession:false},realtime:{params:{eventsPerSecond:30}}}),h=c.channel("guest-raffle-live-fast-v13").on("postgres_changes",{event:"*",schema:"public",table:"guest_raffle_live",filter:"id=eq.main"},p=>A(p.new&&p.new.state)).subscribe(s=>{if(s==="SUBSCRIBED")I()});window.addEventListener("beforeunload",()=>{try{c.removeChannel(h)}catch(e){}})}I();C()})();<\\/script>';
+    text=text.replace('</body>',fastRealtime+'</body>');
+  `;
+  const marker="    document.open('text/html','replace');";
+  if(!source.includes(marker))throw new Error('Upgrade marker not found');
+  source=source.replace(marker,patch+'\n'+marker);
+  document.open('text/html','replace');document.write(source);document.close();
+ }catch(err){console.error(err);document.body.innerHTML='<div class="boot"><div><b>Unable to load Guest Rewards</b><span>Please refresh the page.</span></div></div>'}
 })();
 </script>
 </body>
