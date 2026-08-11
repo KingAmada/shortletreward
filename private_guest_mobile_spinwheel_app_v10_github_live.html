@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#c90000">
+<title>Guest Rewards Spinwheel App</title>
+<style>
+:root{
+  --red:#c90000;--red2:#8f0000;--black:#111114;--gold:#f0bc33;--gold2:#a66c00;
+  --muted:#70707a;--line:#ececf1;--bg:#f6f6f8;--card:#ffffff;--green:#0f9f61;
+  --shadow:0 14px 40px rgba(18,18,28,.10);--radius:24px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--black);font-family:Inter,Arial,Helvetica,sans-serif}
+body{padding-bottom:92px}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{max-width:430px;margin:0 auto;min-height:100dvh;background:var(--bg)}
+.topbar{position:sticky;top:0;z-index:30;padding:12px 16px calc(12px + env(safe-area-inset-top));background:rgba(246,246,248,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.06)}
+.brand{display:flex;align-items:center;gap:12px}
+.brandmark{width:42px;height:42px;border-radius:14px;background:linear-gradient(145deg,var(--red),var(--red2));display:grid;place-items:center;color:#fff;font-weight:950;box-shadow:0 8px 20px rgba(201,0,0,.22)}
+.brandtext b{display:block;font-size:1rem;letter-spacing:-.02em}.brandtext small{color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:.68rem;font-weight:800}
+.screen{display:none;padding:18px 16px 20px}.screen.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero{padding:24px}
+.kicker{display:inline-flex;align-items:center;gap:8px;font-size:.74rem;font-weight:900;color:var(--red);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px}.kicker:before{content:"";width:26px;height:4px;border-radius:999px;background:var(--red)}
+.h1{margin:0;font-size:2.3rem;line-height:.92;letter-spacing:-.05em;font-weight:1000;text-transform:uppercase;font-family:Impact,"Arial Black",sans-serif}
+.h1 .red{color:var(--red)}
+.sub{margin:12px 0 0;color:#2f2f35;font-size:1rem;line-height:1.55;font-weight:650}
+.pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.pill{padding:10px 12px;border-radius:999px;border:1px solid #e0e0e7;background:#fff;font-size:.8rem;font-weight:850}
+.stack{display:grid;gap:14px;margin-top:14px}
+.prizeCard{padding:18px;background:linear-gradient(145deg,#121216,#1b1b21);color:#fff;border:2px solid var(--gold2)}
+.prizeTitle{margin:0 0 12px;text-align:center;text-transform:uppercase;letter-spacing:.08em;font-size:.78rem;color:var(--gold);font-weight:950}
+.prizeRow{display:grid;grid-template-columns:1fr auto;gap:12px;padding:11px 0;border-top:1px solid rgba(255,255,255,.14)}.prizeRow:first-of-type{border-top:0}
+.prizeAmount{font:900 1.8rem/1 Georgia,serif;color:var(--gold);letter-spacing:-.03em}.prizeMeta{align-self:end;font-weight:850}
+.info{padding:18px}.info h3{margin:0 0 8px;font-size:1.2rem}.info p{margin:0;color:var(--muted);line-height:1.6}
+.demoWheelCard{padding:18px;background:linear-gradient(145deg,#141418,#1d1d23);color:#fff;border:2px solid var(--gold2);overflow:hidden}
+.wheelArea{position:relative;aspect-ratio:1;max-width:320px;margin:0 auto 10px;display:grid;place-items:center}.wheelArea:before{content:"";position:absolute;inset:5%;border-radius:50%;box-shadow:0 0 48px rgba(240,188,51,.30),0 24px 58px rgba(0,0,0,.56);transition:.25s}.wheelArea.spinning:before{animation:wheelPulse .75s ease-in-out infinite alternate}.wheelArea.braking:before{animation:wheelPulse .42s ease-in-out infinite alternate}.frame{width:100%;height:100%;border-radius:50%;padding:9px;background:linear-gradient(145deg,#ffe074,#8e5100);box-shadow:0 16px 40px rgba(0,0,0,.45);position:relative;z-index:2}.rotor{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#fff;transition:transform 4s cubic-bezier(.08,.8,.08,1)}.bigWheel .rotor{transition:none!important;will-change:transform}.rotor canvas{width:100%;height:100%;display:block}.pointer{position:absolute;z-index:8;top:-2px;left:50%;transform:translateX(-50%);transform-origin:50% 4px;width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:38px solid var(--red);filter:drop-shadow(0 5px 5px rgba(0,0,0,.55))}.pointer.tick{animation:pointerTick .11s ease-out}.pointer.finalTick{animation:pointerFinal .58s cubic-bezier(.2,1.5,.3,1)}.hub{position:absolute;z-index:6;width:82px;height:82px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff8ba,#e0a500 50%,#8f5600);border:4px solid #fff;display:grid;place-items:center;text-align:center;color:#111;font-weight:950;box-shadow:0 8px 18px rgba(0,0,0,.45);font-size:.72rem;line-height:1.05}.hub small{display:block;font-size:.58rem;margin-top:2px}@keyframes pointerTick{50%{transform:translateX(-50%) rotate(13deg)}}@keyframes pointerFinal{35%{transform:translateX(-50%) rotate(22deg)}70%{transform:translateX(-50%) rotate(-7deg)}}@keyframes wheelPulse{from{filter:drop-shadow(0 0 4px rgba(240,188,51,.2))}to{filter:drop-shadow(0 0 18px rgba(240,188,51,.75))}}
+.demoWinner{margin-top:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:12px;text-align:center}.demoWinner b{display:block;color:var(--gold);font-size:1.2rem}
+.ctaRow{display:flex;gap:12px;margin-top:14px}.btn{border:0;border-radius:16px;min-height:50px;padding:0 18px;font-weight:950}.btn.primary{background:linear-gradient(145deg,var(--red),var(--red2));color:#fff;box-shadow:0 12px 26px rgba(201,0,0,.22)}.btn.soft{background:#ededf2}.btn.dark{background:#151518;color:#fff}.btn.outline{background:#fff;border:1px solid #d9d9e2}.btn.gold{background:linear-gradient(145deg,#ffde7d,#d79600);color:#111}.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.small{font-size:.8rem;color:var(--muted)}
+.formCard{padding:18px}.formTitle{margin:0 0 4px;font-size:1.3rem}.progressWrap{margin-top:14px}.progressTrack{height:8px;background:#ededf1;border-radius:999px;overflow:hidden}.progressBar{height:100%;width:6%;background:linear-gradient(90deg,var(--red),#ff4343)}.progressText{margin-top:8px;font-size:.82rem;color:var(--muted);font-weight:800}
+.fields{display:grid;gap:14px;margin-top:16px}.field label{display:block;font-size:.84rem;font-weight:900;margin-bottom:6px}.field input,.field select{width:100%;height:50px;padding:0 14px;border:1px solid #d9d9e2;border-radius:14px;background:#fff;outline:none}.field input:focus,.field select:focus{border-color:var(--red);box-shadow:0 0 0 4px rgba(201,0,0,.10)}
+.check{display:flex;gap:10px;background:#fafafc;border:1px solid #e2e2e8;border-radius:14px;padding:12px}.check input{width:18px;height:18px;accent-color:var(--red);margin-top:1px}
+.derived{padding:14px;border-radius:16px;background:#fff7f7;border:1px solid #ffd5d5}.derived b{display:block;font-size:1.6rem;color:var(--red);font-family:Impact,"Arial Black",sans-serif}
+.success{display:none;margin-top:14px;padding:14px;border-radius:16px;background:#ecf9f2;border:1px solid #bbdfce}.success.show{display:block}.code{display:inline-block;margin-top:8px;padding:8px 10px;background:#fff;border:1px dashed #89c0a6;border-radius:10px;font-family:ui-monospace,monospace;font-weight:900}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.entryList{display:grid;gap:10px;margin-top:12px}.entryCard{padding:12px 14px;border-radius:18px;background:#fff;border:1px solid var(--line)}.entryTop{display:flex;align-items:center;justify-content:space-between;gap:10px}.entryTop b{font-size:.98rem}.entryMeta{margin-top:5px;color:var(--muted);font-size:.82rem;line-height:1.45}.tag{display:inline-flex;align-items:center;padding:7px 9px;border-radius:999px;font-size:.73rem;font-weight:950}.tag.pending{background:#fff2d8;color:#905500}.tag.verified{background:#e9f8ef;color:#0f8a54}.tag.winnerTag{background:#111;color:#f0bc33}.entryCard.winnerDisabled{opacity:.72;background:#f1f1f4;border-style:dashed}.publicWinnerList{display:grid;gap:8px;margin-top:12px}.publicWinner{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px}.publicWinner b{color:#fff}.publicWinner span{color:var(--gold);font-weight:900;white-space:nowrap}
+.miniStats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.miniStat{padding:12px;border-radius:18px;background:#fff;border:1px solid var(--line)}.miniStat small{display:block;color:var(--muted);text-transform:uppercase;font-size:.65rem;font-weight:900;letter-spacing:.06em}.miniStat b{display:block;margin-top:5px;font-size:1.25rem}
+.console{padding:18px;background:linear-gradient(145deg,#111116,#1d1d24);color:#fff;border:2px solid var(--gold2)}.console h3{margin:0 0 12px;color:#fff}.phaseBar{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid rgba(255,255,255,.1)}.phaseBar:first-of-type{border-top:0}.phaseBar span{color:#cdced6}.phaseBar b{color:var(--gold)}
+.bigWheel{margin-top:12px}.bigWheel .wheelArea{max-width:360px}.telemetry{margin-top:10px;padding:12px;border-radius:16px;background:rgba(255,255,255,.08);text-align:center}.telemetry b{display:block;color:var(--gold);font-size:1.3rem}.telemetry span{display:block;color:#d2d2d8;font-size:.82rem;margin-top:4px}.speedTrack{height:8px;margin-top:10px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.12)}.speedBar{height:100%;width:0;background:linear-gradient(90deg,#47d98b,#f0bc33,#ff3434);border-radius:inherit;transition:width .08s linear}.soundBtn.off{opacity:.58}
+.ticketBox{margin-top:12px;padding:12px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09)}.ticketBox h4{margin:0 0 8px;color:#fff;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}.ticketStream{max-height:88px;overflow:auto;color:#d2d2d8;font-size:.77rem;line-height:1.7}
+.confirm{display:none;margin-top:12px;padding:12px;border-radius:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}.confirm.show{display:block}.confirm input{width:100%;height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:#101014;color:#fff;padding:0 12px;margin-top:8px}
+.resultList{display:grid;gap:10px;margin-top:12px}.winner{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px;border-radius:16px;background:#fff;color:#111;border-left:6px solid var(--red)}.winnerPos{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#111;color:var(--gold);font-weight:950}.winnerPrize{font:900 1rem Georgia,serif;color:var(--red)}
+.bottomnav{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:40;width:min(560px,calc(100% - 20px));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.78);border-radius:26px;box-shadow:0 18px 45px rgba(20,20,30,.18),inset 1px 1px 0 rgba(255,255,255,.72)}
+.navbtn{min-width:0;border:0;background:#f3f3f7;border-radius:18px;padding:10px 5px;font-weight:900;color:#4f4f57;white-space:nowrap}.navbtn.active{background:#fff;color:#111;box-shadow:0 8px 22px rgba(0,0,0,.08)}.navbtn span{display:block;font-size:1.05rem}.navbtn small{display:block;font-size:.7rem;margin-top:4px}
+.modal,.overlay{position:fixed;inset:0;display:none;place-items:center;padding:20px;z-index:80}.modal.show,.overlay.show{display:grid}.scrim{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px)}.modalCard{position:relative;z-index:2;width:min(380px,100%);background:#fff;border-radius:24px;padding:22px;box-shadow:0 24px 70px rgba(0,0,0,.28)}.modalCard h3{margin:0 0 8px}.modalCard p{margin:0;color:var(--muted);line-height:1.55}.modalCard input{width:100%;height:50px;border:1px solid #d9d9e2;border-radius:14px;padding:0 14px;margin-top:14px;outline:none}.modalActions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+.winnerSplash{position:relative;z-index:2;width:min(390px,100%);background:radial-gradient(circle at 50% -10%,#8b2100,#17171c 48%,#08080a 100%);color:#fff;border:2px solid var(--gold);border-radius:28px;padding:28px 22px;text-align:center;box-shadow:0 28px 90px rgba(0,0,0,.55),0 0 60px rgba(240,188,51,.22);overflow:hidden;animation:splashIn .68s cubic-bezier(.16,1.3,.3,1)}.winnerSplash h2{margin:8px 0 0;font:950 2.5rem/.9 Impact,"Arial Black",sans-serif;text-transform:uppercase;letter-spacing:-.04em;text-shadow:0 4px 0 #000}.winnerSplash p{margin:10px 0 0;color:#d6d6dd}.winnerName{margin-top:16px;font:950 2.4rem/.95 Impact,"Arial Black",sans-serif;color:#fff;text-transform:uppercase;text-shadow:0 4px 0 #000}.winnerMoney{margin-top:8px;font:900 2.3rem Georgia,serif;color:var(--gold);text-shadow:0 3px 0 #704300}@keyframes splashIn{from{opacity:0;transform:scale(.72) rotate(-3deg)}to{opacity:1;transform:scale(1) rotate(0)}}.confetti{pointer-events:none;position:absolute;inset:0;overflow:hidden}.confetti i{position:absolute;top:-20px;width:10px;height:18px;border-radius:3px;opacity:.92;animation:fall 2.6s linear forwards}@keyframes fall{to{transform:translateY(115dvh) rotate(720deg);opacity:1}}
+
+.liveHeader{padding:18px;background:linear-gradient(145deg,#fff,#fff7f7)}
+.liveHeader h2{margin:0;font:950 2rem/.95 Impact,"Arial Black",sans-serif;text-transform:uppercase;letter-spacing:-.03em}
+.liveHeader h2 span{color:var(--red)}
+.liveStatus{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:12px 14px;border-radius:16px;background:#f4f4f7;border:1px solid var(--line)}
+.liveDot{width:10px;height:10px;border-radius:50%;background:#8a8a91;box-shadow:0 0 0 0 rgba(15,159,97,.5)}
+.liveDot.on{background:var(--green);animation:livePulse 1.3s infinite}
+@keyframes livePulse{70%{box-shadow:0 0 0 10px rgba(15,159,97,0)}100%{box-shadow:0 0 0 0 rgba(15,159,97,0)}}
+.liveStatusText{display:flex;align-items:center;gap:9px;font-weight:900}.liveStatus small{display:block;color:var(--muted);font-weight:700;margin-top:2px}
+.liveConsole{padding:18px;background:linear-gradient(145deg,#111116,#1d1d24);color:#fff;border:2px solid var(--gold2)}
+.liveWinnerHero{margin-top:12px;padding:15px;border-radius:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);text-align:center}
+.liveWinnerHero small{display:block;color:#d3d3db;text-transform:uppercase;letter-spacing:.08em;font-weight:850}.liveWinnerHero b{display:block;color:var(--gold);font-size:1.4rem;margin-top:5px}
+.homeDemoNote{text-align:center;color:#d5d5db;font-size:.78rem;margin:-4px 0 12px}
+
+.footerNote{padding:0 16px 20px;color:var(--muted);font-size:.76rem;line-height:1.5;text-align:center}
+@media (min-width:700px){.app{max-width:1100px;padding-bottom:30px}.topbar{padding-left:24px;padding-right:24px}.layout2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.screen{padding:24px}.h1{font-size:4rem}.stack3{display:grid;grid-template-columns:1fr 1fr;gap:16px}.entryList{grid-template-columns:1fr 1fr}.drawGrid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:start}.toolbar{margin-top:0}}
+
+/* === v5 premium UI overrides === */
+body{background:radial-gradient(circle at top left,rgba(255,245,247,.95),transparent 28%),radial-gradient(circle at top right,rgba(255,253,242,.9),transparent 22%),linear-gradient(180deg,#f8f8fb 0%,#f3f3f8 100%)}
+.card{border:1px solid rgba(255,255,255,.55);box-shadow:18px 18px 40px rgba(186,186,205,.23),-12px -12px 28px rgba(255,255,255,.88)}
+.hero,.liveHeader{background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(255,255,255,.58));backdrop-filter:blur(18px)}
+.formCard{background:linear-gradient(135deg,rgba(255,255,255,.50),rgba(255,255,255,.32));backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.65);box-shadow:22px 22px 45px rgba(201,204,217,.34),-14px -14px 28px rgba(255,255,255,.95),inset 1px 1px 0 rgba(255,255,255,.65)}
+.formTitle{font-size:1.45rem;letter-spacing:-.02em}
+.progressTrack{background:linear-gradient(145deg,#ececf3,#ffffff);box-shadow:inset 6px 6px 10px rgba(202,204,217,.55), inset -6px -6px 10px rgba(255,255,255,.85)}
+.fields{gap:16px;margin-top:18px}
+.field label{font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;color:#5f5f68}
+.field input,.field select{height:54px;border:1px solid rgba(255,255,255,.9);background:linear-gradient(145deg,rgba(255,255,255,.80),rgba(245,246,251,.86));box-shadow:inset 4px 4px 10px rgba(226,228,238,.65), inset -5px -5px 10px rgba(255,255,255,.92), 0 10px 26px rgba(194,197,212,.16)}
+.field input:focus,.field select:focus{border-color:rgba(201,0,0,.22);box-shadow:0 0 0 4px rgba(201,0,0,.08), inset 4px 4px 10px rgba(226,228,238,.65), inset -5px -5px 10px rgba(255,255,255,.92)}
+.check,.derived,.success{background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(247,247,252,.88));border:1px solid rgba(255,255,255,.86);box-shadow:12px 12px 28px rgba(201,204,218,.22),-7px -7px 18px rgba(255,255,255,.85),inset 1px 1px 0 rgba(255,255,255,.75)}
+.derived{background:linear-gradient(135deg,rgba(255,246,246,.9),rgba(255,255,255,.82))}
+.btn{position:relative;overflow:hidden;transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn.soft,.btn.outline,.glassBtn{background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(241,242,248,.94));border:1px solid rgba(255,255,255,.9);box-shadow:12px 12px 24px rgba(198,201,214,.24),-8px -8px 18px rgba(255,255,255,.92);color:#26262d}
+.btn.primary{box-shadow:0 14px 28px rgba(201,0,0,.22), inset 1px 1px 0 rgba(255,255,255,.18)}
+.btn.gold{box-shadow:0 12px 24px rgba(215,150,0,.25), inset 1px 1px 0 rgba(255,255,255,.35)}
+.btn.dark{box-shadow:0 12px 24px rgba(0,0,0,.22)}
+.toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.toolbar .btn{width:100%;justify-content:center;min-height:48px;font-size:.88rem;border-radius:18px}
+.entryList{display:grid;gap:14px;margin-top:16px}
+.entryCard{position:relative;padding:16px 16px 14px;border-radius:24px;background:linear-gradient(135deg,rgba(255,255,255,.72),rgba(250,250,253,.92));border:1px solid rgba(255,255,255,.88);box-shadow:18px 18px 32px rgba(200,203,215,.23),-10px -10px 20px rgba(255,255,255,.92),inset 1px 1px 0 rgba(255,255,255,.72)}
+.entryCard:before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:6px;border-radius:999px;background:linear-gradient(180deg,var(--red),#ff7777)}
+.entryCard.winnerDisabled{background:linear-gradient(135deg,rgba(249,249,251,.9),rgba(238,239,244,.95));opacity:1}
+.entryCard.winnerDisabled:before{background:linear-gradient(180deg,#222,#f0bc33)}
+.entryTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.entryIdentity b{display:block;font-size:1.08rem;line-height:1.05;letter-spacing:-.02em}
+.entryIdentity small{display:block;margin-top:5px;color:#767680;font-weight:800}
+.tag{padding:9px 12px;border-radius:999px;font-size:.72rem;font-weight:950;letter-spacing:.02em;box-shadow:inset 1px 1px 0 rgba(255,255,255,.3)}
+.tag.pending{background:linear-gradient(145deg,#fff4dc,#ffe7b1);color:#8f5900}
+.tag.verified{background:linear-gradient(145deg,#eaf9f0,#d6f4e4);color:#0d8650}
+.tag.winnerTag{background:linear-gradient(145deg,#2c2c31,#535358);color:#ffd55f}
+.entryChips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.entryChip{display:inline-flex;align-items:center;gap:6px;padding:9px 11px;border-radius:14px;background:rgba(255,255,255,.75);border:1px solid rgba(230,231,238,.95);font-size:.78rem;font-weight:850;color:#3b3b43;box-shadow:6px 6px 14px rgba(208,210,221,.18),-4px -4px 10px rgba(255,255,255,.8)}
+.entryChip.hot{background:linear-gradient(145deg,rgba(255,246,230,.95),rgba(255,234,195,.92));color:#8e5200}
+.entryNote{margin-top:12px;padding:11px 12px;border-radius:14px;background:rgba(248,248,252,.86);border:1px solid rgba(232,233,240,.95);color:#65656e;font-size:.79rem;line-height:1.5;font-weight:800}
+.entryNote.winnerNote{background:linear-gradient(145deg,rgba(255,250,236,.96),rgba(246,240,220,.96));color:#7b5a00}
+.entryActions{display:flex;justify-content:flex-end;margin-top:12px}
+.entryAction{min-height:44px;padding:0 16px;border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.86),rgba(242,243,248,.96));border:1px solid rgba(255,255,255,.92);box-shadow:10px 10px 18px rgba(198,201,214,.22),-6px -6px 14px rgba(255,255,255,.9);font-size:.84rem;color:#25252c}
+.entryAction:disabled{background:linear-gradient(145deg,rgba(243,244,248,.85),rgba(235,236,242,.95));opacity:.7}
+.entryCard.emptyState{display:flex;align-items:center;gap:14px;padding:20px}.entryEmptyIcon{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,#fff,#f0f0f6);box-shadow:10px 10px 20px rgba(196,198,210,.2),-6px -6px 14px rgba(255,255,255,.95);font-size:1.4rem}
+.liveStatus{background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(247,248,252,.95));box-shadow:12px 12px 28px rgba(201,204,217,.18),-8px -8px 18px rgba(255,255,255,.92)}
+.footerNote{display:none!important}
+@media (max-width:699px){.toolbar{grid-template-columns:1fr 1fr}.entryCard{padding:15px}.entryTop{flex-direction:column;align-items:flex-start}.tag{align-self:flex-start}.entryActions{justify-content:stretch}.entryAction{width:100%}}
+
+
+@media (max-width:390px){.bottomnav{gap:6px;padding-left:8px;padding-right:8px}.navbtn{padding-left:3px;padding-right:3px}.navbtn small{font-size:.64rem}}
+
+.nextDrawTimer{display:flex!important;align-items:center;gap:10px;margin-top:7px;color:#6f6f78!important;font-weight:850!important;text-transform:uppercase;letter-spacing:.06em}
+.nextDrawTimer span{font-size:.69rem}
+.nextDrawTimer strong{display:inline-flex;align-items:center;justify-content:center;min-width:92px;padding:7px 10px;border-radius:12px;background:linear-gradient(145deg,#fff0f0,#ffe1e1);color:var(--red);font-size:.9rem;letter-spacing:.08em;box-shadow:inset 1px 1px 0 rgba(255,255,255,.75),0 7px 18px rgba(201,0,0,.12);animation:countdownBlink 1s ease-in-out infinite}
+@keyframes countdownBlink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.97)}}
+
+
+/* === v9 contained collapsible guest directory === */
+#phaseText{display:none!important}
+.entryCollapseBtn{
+  width:100%;margin-top:16px;padding:14px 16px;border:1px solid rgba(255,255,255,.9);border-radius:20px;
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;text-align:left;color:#24242b;
+  background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(240,241,247,.96));
+  box-shadow:12px 12px 24px rgba(197,200,214,.23),-8px -8px 18px rgba(255,255,255,.94),inset 1px 1px 0 rgba(255,255,255,.8);
+  font:inherit;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;
+}
+.entryCollapseBtn:hover{transform:translateY(-1px);box-shadow:14px 14px 28px rgba(197,200,214,.28),-9px -9px 20px rgba(255,255,255,.96)}
+.entryCollapseIcon{width:42px;height:42px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(145deg,#fff,#eceef5);box-shadow:7px 7px 15px rgba(197,200,214,.2),-5px -5px 12px rgba(255,255,255,.95);font-size:1.15rem}
+.entryCollapseCopy b{display:block;font-size:.94rem;letter-spacing:-.01em}.entryCollapseCopy small{display:block;margin-top:3px;color:var(--muted);font-size:.74rem;font-weight:800}
+.entryCollapseChevron{font-size:1.45rem;line-height:1;transition:transform .24s ease;color:#65656d}.entryCollapseBtn[aria-expanded="false"] .entryCollapseChevron{transform:rotate(-90deg)}
+.entryListWrap{max-height:0;overflow:hidden;opacity:0;transition:max-height .38s ease,opacity .25s ease,margin .25s ease;margin-top:0}
+.entryListWrap.open{max-height:560px;overflow-y:auto;overscroll-behavior:contain;opacity:1;margin-top:12px;padding:3px 8px 14px 3px;scrollbar-width:thin;scrollbar-color:#c9c9d2 transparent}
+.entryListWrap::-webkit-scrollbar{width:8px}.entryListWrap::-webkit-scrollbar-thumb{background:#c9c9d2;border-radius:999px}.entryListWrap::-webkit-scrollbar-track{background:transparent}
+.entryList{margin-top:0!important;grid-template-columns:1fr!important}
+.entryCard{contain:content}
+@media(max-width:699px){.entryListWrap.open{max-height:430px}.entryCollapseBtn{padding:12px 13px}.entryCollapseIcon{width:38px;height:38px}}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brandmark">8</div>
+      <div class="brandtext"><b>Guest Rewards</b><small>Private Spinwheel Draw</small></div>
+    </div>
+  </header>
+
+  <main>
+    <section id="homeScreen" class="screen active">
+      <div class="card hero">
+        <h1 class="h1">Rewarding <span class="red">Our Guests</span></h1>
+        <p class="sub">Enter your booking details to verify you're our guest</p>
+        <div class="pills">
+          <div class="pill">No Payment Required</div>
+          <div class="pill">Verified Stays Only</div>
+          <div class="pill">Every Stay Day Becomes One Wheel Slot</div>
+          <div class="pill">8 Different Guests Must Win!</div>
+        </div>
+        <div class="ctaRow">
+          <button class="btn primary" id="goEnterBtn">Verify</button>
+          <button class="btn soft" id="goDrawBtn">Watch Live Draw</button>
+        </div>
+      </div>
+
+      <div class="stack3 stack">
+        <div class="card prizeCard">
+          <div class="prizeTitle">This Month’s Private Guest Draw</div>
+          <div class="prizeRow"><div class="prizeAmount">₦1,000,000</div><div class="prizeMeta">1 Winner</div></div>
+          <div class="prizeRow"><div class="prizeAmount">₦100,000</div><div class="prizeMeta">3 Winners</div></div>
+          <div class="prizeRow"><div class="prizeAmount">₦50,000</div><div class="prizeMeta">4 Winners</div></div>
+        </div>
+
+        <div id="homeWheelCard" class="card demoWheelCard">
+          <div class="prizeTitle" style="margin-bottom:6px">You Might Be Our Lucky Guest</div>
+          
+          <div id="homeWheelStage" class="wheelArea">
+            <div class="pointer"></div>
+            <div class="frame"><div id="homeRotor" class="rotor"><canvas id="homeCanvas" width="800" height="800"></canvas></div></div>
+            <div class="hub">Guest<br><b>Rewards</b></div>
+          </div>
+          <div class="demoWinner">
+            
+            <b id="homeDemoWinner">Preparing automatic spin...</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="card info" style="margin-top:14px">
+        <h3>How the wheel works</h3>
+        <p>The more you stay the more your booking appears on the wheel which means higher chance of you winning the draw.</p>
+      </div>
+    </section>
+
+    <section id="enterScreen" class="screen">
+      <div class="card formCard">
+        <h2 class="formTitle">Verify Your Booking</h2>
+        <div class="small">Enter your booking details. Once your stay is verified, your stay days determine your wheel slots.</div>
+        <div class="progressWrap">
+          <div class="progressTrack"><div id="progressBar" class="progressBar"></div></div>
+          <div id="progressText" class="progressText">0% complete</div>
+        </div>
+
+        <form id="entryForm" novalidate>
+          <div class="fields">
+            <div class="field"><label for="fullName">Full Name</label><input id="fullName" required placeholder="As used for booking"></div>
+            <div class="field"><label for="phone">Phone Number</label><input id="phone" required inputmode="numeric" maxlength="11" pattern="^0\d{10}$" placeholder="08012345678"></div>
+            <div class="field"><label for="email">Email Address</label><input id="email" type="email" placeholder="Optional"></div>
+            <div class="field"><label for="location">Location</label>
+              <select id="location" required>
+                <option value="">Select Location</option>
+                <option>Hilltop Katampe</option>
+                <option>Palmwood Jahi</option>
+                <option>Bradford Gwarinpa</option>
+                <option>Whitehouse Gwarinpa</option>
+              </select>
+            </div>
+            <div class="field"><label for="apartment">Apartment / Unit</label><select id="apartment" required disabled><option value="">Select a Location First</option></select></div>
+            <div class="field"><label for="checkIn">Check-In Date</label><input id="checkIn" type="date" required></div>
+            <div class="field"><label for="checkOut">Check-Out Date</label><input id="checkOut" type="date" required></div>
+          </div>
+
+          <div id="derived" class="derived" style="margin-top:14px">
+            <div class="small" style="margin-bottom:6px;color:#6d5454">Estimated Wheel Slots</div>
+            <b id="slotCount">1 Slot</b>
+            <div class="small" id="slotExplain">Enter your stay dates to calculate your wheel slots.</div>
+          </div>
+
+          <label class="check" style="margin-top:14px">
+            <input id="consent" type="checkbox" required>
+            <span>I confirm these booking details are correct and I permit the organiser to verify my stay for the draw.</span>
+          </label>
+
+          <div class="ctaRow" style="margin-top:16px">
+            <button type="submit" class="btn primary">Verify Booking</button>
+          </div>
+          <div class="small" style="margin-top:10px">Phone number must be an 11-digit Nigerian mobile number.</div>
+
+          <div id="successCard" class="success">
+            <b>Your entry was received.</b>
+            <div class="small" style="margin-top:4px;color:#3d6d54">Verification is pending. Keep this private entry code.</div>
+            <div id="entryCode" class="code"></div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section id="watchScreen" class="screen">
+      <div class="card liveHeader">
+        <div class="kicker">Public Guest Viewing Page</div>
+        <h2>Watch Winners <span>Live</span></h2>
+        <div class="liveStatus">
+          <div>
+            <div class="liveStatusText"><i id="liveDot" class="liveDot"></i><span id="liveState">Waiting for the next official spin</span></div>
+            <small id="liveStateMeta" class="nextDrawTimer"><span id="nextDrawLabel">Next Draw In</span><strong id="nextDrawCountdown">24:00:00</strong></small>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="card liveConsole" style="margin-top:14px">
+        <div class="phaseBar"><span>Current Prize</span><b id="livePrize">₦1,000,000</b></div>
+        <div class="phaseBar"><span>Winners Drawn</span><b id="liveProgress">0 / 8</b></div>
+        <div class="phaseBar"><span>Eligible Wheel Slots</span><b id="liveSlots">0</b></div>
+
+        <div class="bigWheel">
+          <div id="watchWheelStage" class="wheelArea">
+            <div class="pointer"></div>
+            <div class="frame"><div id="watchRotor" class="rotor"><canvas id="watchCanvas" width="900" height="900"></canvas></div></div>
+            <div class="hub">Live<br><b>Draw</b><small id="watchHubSlots">0 slots</small></div>
+          </div>
+          <div class="telemetry"><b id="liveSpeedReadout">0 KM/H</b><span id="livePhaseText">Waiting for the administrator</span><div class="speedTrack"><div id="liveSpeedBar" class="speedBar"></div></div></div>
+        </div>
+
+        <div class="liveWinnerHero">
+          <small>Latest Confirmed Winner</small>
+          <b id="watchLatestWinner">No winner has been drawn yet.</b>
+        </div>
+        <div id="watchWinnerList" class="publicWinnerList"></div>
+      </div>
+    </section>
+
+    <section id="drawScreen" class="screen">
+      <div class="miniStats">
+        <div class="miniStat"><small>Total Entries</small><b id="entryCount">0</b></div>
+        <div class="miniStat"><small>Verified Guests</small><b id="verifiedCount">0</b></div>
+        <div class="miniStat"><small>Wheel Slots</small><b id="wheelSlots">0</b></div>
+      </div>
+
+      <div class="drawGrid" style="margin-top:14px">
+        <div>
+          <div class="card" style="padding:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <h3 style="margin:0">Guest Entries</h3>
+              <div id="drawBadge" class="tag verified">Entries Open</div>
+            </div>
+            <div class="toolbar">
+              <button id="verifyAllBtn" class="btn soft">✓ Verify All</button>
+              <button id="lockBtn" class="btn outline">🔒 Lock Draw</button>
+              <button id="demoBtn" class="btn outline">✨ Add Demo</button>
+              <button id="exportBtn" class="btn outline">⬇ Export CSV</button>
+              <button id="openLiveBtn" class="btn outline">📺 Open Live Page</button>
+              <button id="clearBtn" class="btn dark">🗑 Clear Data</button>
+            </div>
+            <button id="entryCollapseBtn" class="entryCollapseBtn" type="button" aria-expanded="true" aria-controls="entryListWrap">
+              <span class="entryCollapseIcon">👥</span>
+              <span class="entryCollapseCopy"><b>Guest Entry Directory</b><small id="entryCollapseMeta">0 guests</small></span>
+              <span class="entryCollapseChevron">⌄</span>
+            </button>
+            <div id="entryListWrap" class="entryListWrap open">
+              <div id="entryList" class="entryList"></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card console">
+            <h3>Administrator Spinwheel Controls</h3>
+            <div class="phaseBar"><span>Spin Duration</span><b>30 Seconds</b></div>
+            <div class="phaseBar"><span>Current Prize</span><b id="nextPrize">₦1,000,000</b></div>
+            <div class="phaseBar"><span>Winners Drawn</span><b id="spinProgress">0 / 8</b></div>
+
+            <div class="bigWheel">
+              <div id="wheelStage" class="wheelArea">
+                <div class="pointer"></div>
+                <div class="frame"><div id="mainRotor" class="rotor"><canvas id="mainCanvas" width="900" height="900"></canvas></div></div>
+                <div class="hub">Guest<br><b>Draw</b><small id="hubSlots">0 slots</small></div>
+              </div>
+              <div class="telemetry"><b id="speedReadout">0 KM/H</b><span id="phaseText" aria-hidden="true"></span><div class="speedTrack"><div id="speedBar" class="speedBar"></div></div></div>
+            </div>
+
+            <div class="ticketBox">
+              <h4>Spread Wheel Slots</h4>
+              <div id="ticketStream" class="ticketStream">Verify yourself to appear on the wheel</div>
+            </div>
+
+            <div class="toolbar">
+              <button id="prepareBtn" class="btn gold">🎯 Prepare Spin</button>
+            </div>
+            <div id="confirmBox" class="confirm">
+              <div class="small" style="color:#d3d4dc">Type <b>SPIN NOW</b> to confirm the next winner.</div>
+              <input id="confirmInput" placeholder="SPIN NOW" autocomplete="off">
+              <div class="ctaRow" style="margin-top:10px"><button id="spinBtn" class="btn primary" disabled>Start Spin</button></div>
+            </div>
+
+            <div id="resultList" class="resultList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="footerNote"></div>
+</div>
+
+<nav class="bottomnav">
+  <button class="navbtn active" data-screen="homeScreen"><span>🏠</span><small>Home</small></button>
+  <button class="navbtn" data-screen="enterScreen"><span>✓</span><small>Verify</small></button>
+  <button class="navbtn" data-screen="watchScreen"><span>📺</span><small>Live</small></button>
+  <button class="navbtn" data-screen="drawScreen"><span>🔐</span><small>Admin</small></button>
+</nav>
+
+<div id="pinModal" class="modal">
+  <div class="scrim"></div>
+  <div class="modalCard">
+    <h3>Enter Admin PIN</h3>
+    <p>This protects the draw room on this device.</p>
+    <input id="pinInput" type="password" inputmode="numeric" placeholder="Admin PIN">
+    <div class="modalActions">
+      <button id="pinCancel" class="btn outline">Cancel</button>
+      <button id="pinSubmit" class="btn primary">Open Draw Room</button>
+    </div>
+  </div>
+</div>
+
+<div id="winnerOverlay" class="overlay">
+  <div class="scrim"></div>
+  <div class="winnerSplash">
+    <div id="confetti" class="confetti"></div>
+    <div class="small" style="text-transform:uppercase;font-weight:900;color:var(--red);letter-spacing:.12em">Winner Confirmed</div>
+    <h2>Congratulations!</h2>
+    <div id="winnerName" class="winnerName">Guest</div>
+    <div id="winnerPrize" class="winnerMoney">₦0</div>
+    <p id="winnerMeta">Prepare the next spin when you are ready.</p>
+    <div class="ctaRow" style="justify-content:center">
+      <button id="nextSpinBtn" class="btn primary">Prepare Next Spin</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(()=>{
+  const KEY = 'guestRewardsMobileApp_v1';
+  const SUPABASE_URL = 'https://rwvngisohnflfofikspy.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_V3B4qEnO8hPcHofizy8zoA_TDANaLlx';
+  const RAFFLE_API = SUPABASE_URL + '/functions/v1/guest-raffle-api';
+  const NEXT_DRAW_KEY = 'guestRewardsNextDrawAt_v1';
+  const NEXT_DRAW_INTERVAL = 24 * 60 * 60 * 1000;
+  const LOCATIONS = ['Hilltop Katampe','Palmwood Jahi','Bradford Gwarinpa','Whitehouse Gwarinpa'];
+  const PRIZES = ['₦1,000,000','₦100,000','₦100,000','₦100,000','₦50,000','₦50,000','₦50,000','₦50,000'];
+  const UNIT_OPTIONS = {
+    'Hilltop Katampe': [
+      '4 Bedroom Apartment — Unit 1','4 Bedroom Apartment — Unit 2','4 Bedroom Apartment — Unit 3',
+      '1 Bedroom Apartment — Unit 1','1 Bedroom Apartment — Unit 2','1 Bedroom Apartment — Unit 3'
+    ],
+    'Palmwood Jahi': [
+      '2 Bedroom Apartment — Unit 1','2 Bedroom Apartment — Unit 2',
+      '3 Bedroom Apartment — Unit 1','3 Bedroom Apartment — Unit 2',
+      '1 Bedroom Apartment — Unit 1','1 Bedroom Apartment — Unit 2'
+    ],
+    'Whitehouse Gwarinpa': [
+      '1 Bedroom Apartment — Unit 1','1 Bedroom Apartment — Unit 2','1 Bedroom Apartment — Unit 3',
+      'Studio Apartment — Unit 1','Studio Apartment — Unit 2','Studio Apartment — Unit 3'
+    ],
+    'Bradford Gwarinpa': [
+      'Studio Apartment — Unit 1','Studio Apartment — Unit 2','Studio Apartment — Unit 3','Studio Apartment — Unit 4',
+      '2 Bedroom Apartment — Unit 1'
+    ]
+  };
+  const HOME_DEMO_NAMES = ['Amina Yusuf','Tunde Adeyemi','Rahila James','David Peter','Ngozi Eze','Musa Bello','Fatima Ibrahim','Emeka Nwosu','Zainab Lawal','Ibrahim Sani'];
+  const COLORS = ['#c90000','#111111','#efb92d','#8e0000','#35353a','#f15d2a','#7936a8','#007f78','#1557a5','#b06b00','#d91e6b','#3f7d20','#00a7c4','#e7438c'];
+  const PRELOAD_APARTMENTS = Array.from({length:25},(_,i)=>({entryId:'APARTMENT-'+(i+1),label:'Apartment '+String(i+1).padStart(2,'0'),location:'Portfolio',days:1,placeholder:true}));
+
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const byId = id => document.getElementById(id);
+
+  let state = load();
+  let adminOpen = false;
+  let adminPin = '';
+  let remoteLiveState = {status:'idle',locked:false,tickets:[],winners:[],spinPlan:null,updatedAt:0};
+  let lastRemotePlanId = '';
+  let remoteSpinRAF = 0;
+  let spinning = false;
+  let wheelRotation = 0;
+  let demoRotation = 0;
+  let demoTimer = null;
+  let currentTickets = [];
+  let currentTicketSignature = '';
+  let spinRAF = 0;
+  const soundEnabled = true;
+  let liveSoundEnabled = true;
+  const liveChannel = 'BroadcastChannel' in window ? new BroadcastChannel('guest-rewards-live-draw-v1') : null;
+  let audioCtx = null, engineOsc = null, engineGain = null, noiseSource = null, noiseGain = null;
+  let lastTickBoundary = 0, lastTickTime = 0;
+
+  function load(){
+    try{
+      const x = JSON.parse(localStorage.getItem(KEY));
+      return x && Array.isArray(x.entries) ? Object.assign({entries:[],locked:false,results:[],log:[]},x) : {entries:[],locked:false,results:[],log:[]};
+    }catch{ return {entries:[],locked:false,results:[],log:[]}; }
+  }
+  function save(){ currentTicketSignature=''; currentTickets=[]; localStorage.setItem(KEY, JSON.stringify(state)); render(); }
+  async function apiCall(action, payload={}, pin=adminPin){
+    const res = await fetch(RAFFLE_API, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},
+      body:JSON.stringify({action,...payload,...(pin?{pin}:{})})
+    });
+    let data={}; try{data=await res.json()}catch{}
+    if(!res.ok) throw new Error(data.error || 'Server request failed');
+    return data;
+  }
+  function rowToEntry(r){
+    return {id:r.id,fullName:r.full_name,phone:r.phone,email:r.email||'',location:r.location,apartment:r.apartment,checkIn:r.check_in,checkOut:r.check_out,days:Number(r.stay_days)||1,status:r.status||'pending',wonAt:r.won_at||null,prize:r.prize||null,created:r.created_at};
+  }
+  function rebuildResults(){
+    state.results = state.entries.filter(e=>e.wonAt).sort((a,b)=>new Date(a.wonAt)-new Date(b.wonAt)).map(e=>({...e,prize:e.prize||'Prize'}));
+  }
+  async function refreshEntriesFromServer(){
+    if(!adminPin) return;
+    const data=await apiCall('list_entries');
+    state.entries=(data.entries||[]).map(rowToEntry); rebuildResults();
+    localStorage.setItem(KEY,JSON.stringify(state)); currentTicketSignature=''; currentTickets=[]; render();
+  }
+  function publicWinners(){
+    return state.results.map(w=>({id:w.id,name:mask(w.fullName),fullName:w.fullName,prize:w.prize,location:w.location,days:w.days}));
+  }
+  function publicTickets(){
+    return buildTickets().map(t=>({entryId:t.entryId,label:t.label,location:t.location,days:t.days,slot:t.slot}));
+  }
+  async function publishLiveState(extra={}){
+    if(!adminPin) return;
+    const payload={status:'idle',locked:!!state.locked,tickets:publicTickets(),winners:publicWinners(),spinPlan:null,...extra};
+    try{await apiCall('set_live',{state:payload});}catch(err){console.warn('Live sync failed',err);}
+  }
+  async function fetchLiveState(){
+    try{
+      const res=await fetch(SUPABASE_URL+'/rest/v1/guest_raffle_live?id=eq.main&select=state',{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}});
+      if(!res.ok) return;
+      const rows=await res.json(); const live=rows?.[0]?.state;
+      if(!live) return;
+      remoteLiveState=live;
+      state.locked=!!live.locked;
+      applyRemoteLiveState(live);
+    }catch(err){console.warn('Live read failed',err);}
+  }
+  function setLiveOnlyTelemetry(speed,phase,phaseKey=''){
+    const s=Math.max(0,Math.min(260,Math.round(speed)));
+    byId('liveSpeedReadout').textContent=`${s} KM/H`;byId('livePhaseText').textContent=phase||'';byId('liveSpeedBar').style.width=(s/260*100)+'%';
+    const active=phaseKey==='accel'||phaseKey==='cruise'||phaseKey==='brake';
+    byId('liveDot').classList.toggle('on',active);
+    byId('liveState').textContent=active?'Official wheel is spinning live':phase==='Winner locked'?'Winner confirmed':'Waiting for the next official spin';
+    const stage=byId('watchWheelStage');if(stage){stage.classList.toggle('spinning',active);stage.classList.toggle('braking',phaseKey==='brake');}
+  }
+  function animateRemoteSpin(plan){
+    if(!plan||!plan.id||plan.id===lastRemotePlanId||(spinning&&adminOpen)) return;
+    lastRemotePlanId=plan.id; cancelAnimationFrame(remoteSpinRAF);
+    const tickets=Array.isArray(plan.tickets)?plan.tickets:[]; if(tickets.length) drawWheel(byId('watchCanvas'),tickets);
+    const rotor=byId('watchRotor'), TA=Number(plan.TA)||10000,TC=Number(plan.TC)||5000,TD=Number(plan.TD)||15000,total=TA+TC+TD;
+    const startAngle=Number(plan.startAngle)||0,totalDelta=Number(plan.totalDelta)||0,w=totalDelta/(TA/2+TC+TD/3),dA=w*TA/2,dC=w*TC,dD=w*TD/3,startAt=Number(plan.startAt)||Date.now();
+    startSpinSound();
+    function frame(){
+      const elapsed=Math.min(total,Math.max(0,Date.now()-startAt));let angle,speed,label,phase;
+      if(elapsed<TA){const p=elapsed/TA,remain=Math.max(0,Math.ceil((TA-elapsed)/1000));angle=startAngle+dA*p*p;speed=259*p;label=speed<70?`Building momentum · ${remain}s`:speed<180?`Accelerating hard · ${remain}s`:`Approaching 259 KM/H · ${remain}s`;phase='accel';}
+      else if(elapsed<TA+TC){const p=(elapsed-TA)/TC,remain=Math.max(0,Math.ceil((TA+TC-elapsed)/1000));angle=startAngle+dA+dC*p;speed=259;label=`Full-speed spin · ${remain}s`;phase='cruise';}
+      else{const p=(elapsed-TA-TC)/TD,remain=Math.max(0,Math.ceil((total-elapsed)/1000));angle=startAngle+dA+dC+dD*(1-Math.pow(1-p,3));speed=260*Math.pow(1-p,2);label=p<.16?`260 KM/H — BRAKING! · ${remain}s`:p<.58?'':p<.86?`Locking onto a name · ${remain}s`:`Final ticks · ${remain}s`;phase='brake';}
+      rotor.style.transform=`rotate(${angle}deg)`;setLiveOnlyTelemetry(speed,label,phase);updateSpinSound(speed,phase);
+      if(elapsed<total) remoteSpinRAF=requestAnimationFrame(frame);else{stopSpinSound();setLiveOnlyTelemetry(0,'Winner locked','');pointerTick(true);}
+    }
+    remoteSpinRAF=requestAnimationFrame(frame);
+  }
+  function applyRemoteLiveState(live){
+    const realTickets=Array.isArray(live.tickets)?live.tickets:[];
+    const visualTickets=realTickets.length?realTickets:PRELOAD_APARTMENTS;
+    if(!(spinning&&adminOpen)) drawWheel(byId('watchCanvas'),visualTickets);
+    byId('liveSlots').textContent=realTickets.length;
+    byId('watchHubSlots').textContent=realTickets.length?`${realTickets.length} slot${realTickets.length===1?'':'s'}`:'25 apartments';
+    const winners=Array.isArray(live.winners)?live.winners:[];
+    byId('liveProgress').textContent=`${winners.length} / 8`;
+    byId('livePrize').textContent=PRIZES[winners.length]||'Completed';
+    if(winners.length){const latest=winners[winners.length-1];byId('watchLatestWinner').textContent=`${latest.name||latest.fullName||'Guest'} won ${latest.prize}`;byId('watchWinnerList').innerHTML=winners.map((w,i)=>`<div class="publicWinner"><b>${i+1}. ${esc(w.name||w.fullName||'Guest')}</b><span>${esc(w.prize||'')}</span></div>`).join('');}
+    else{byId('watchLatestWinner').textContent=realTickets.length?'Waiting for the official spin...':'Verify yourself to appear on the wheel';byId('watchWinnerList').innerHTML='';}
+    if(live.status==='spinning'&&live.spinPlan) animateRemoteSpin(live.spinPlan);
+    else if(live.status==='winner'){setLiveOnlyTelemetry(0,'Winner locked','');}
+  }
+  function uid(){ return 'GUEST-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase(); }
+  function esc(s){ return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function mask(name){ let p=String(name).trim().split(/\s+/).filter(Boolean); if(p.length<2) return p[0]||'Guest'; return p[0]+' '+p[p.length-1][0]+'.'; }
+  function nights(a,b){ if(!a||!b) return 0; const d = Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000); return d>0?d:0; }
+  function digits(v){ return String(v||'').replace(/\D/g,''); }
+  function showScreen(id, updateHash=true){
+    if(id==='drawScreen' && !adminOpen){ byId('pinModal').classList.add('show'); byId('pinInput').value=''; setTimeout(()=>byId('pinInput').focus(),50); return; }
+    $$('.screen').forEach(s=>s.classList.toggle('active', s.id===id));
+    $$('.navbtn').forEach(n=>n.classList.toggle('active', n.dataset.screen===id));
+    if(updateHash){
+      const hash={homeScreen:'#home',enterScreen:'#enter',watchScreen:'#live',drawScreen:'#admin'}[id]||'#home';
+      if(location.hash!==hash) history.replaceState(null,'',hash);
+    }
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  $$('.navbtn').forEach(btn=>btn.addEventListener('click', ()=>{
+    if(btn.dataset.screen==='drawScreen' && !adminOpen){ byId('pinModal').classList.add('show'); byId('pinInput').value=''; return; }
+    showScreen(btn.dataset.screen);
+  }));
+  byId('goEnterBtn').onclick = ()=> showScreen('enterScreen');
+  byId('goDrawBtn').onclick = ()=> showScreen('watchScreen');
+  byId('pinCancel').onclick = ()=> byId('pinModal').classList.remove('show');
+  byId('pinSubmit').onclick = async()=>{
+    const pin=byId('pinInput').value.trim();
+    try{await apiCall('verify_admin',{pin},'');adminPin=pin;adminOpen=true;byId('pinModal').classList.remove('show');await refreshEntriesFromServer();await fetchLiveState();showScreen('drawScreen');}
+    catch(err){alert(err.message||'Incorrect PIN');}
+  };
+  byId('pinInput').addEventListener('keydown', e=>{ if(e.key==='Enter') byId('pinSubmit').click(); });
+
+  const phone = byId('phone');
+  phone.addEventListener('input', ()=>{ phone.value = digits(phone.value).slice(0,11); updateProgress(); });
+  ['fullName','email','location','apartment','checkIn','checkOut','consent'].forEach(id=>{
+    byId(id).addEventListener('input', updateProgress);
+    byId(id).addEventListener('change', updateProgress);
+  });
+
+  function populateUnits(){
+    const location=byId('location').value, apartment=byId('apartment'), options=UNIT_OPTIONS[location]||[];
+    apartment.innerHTML = options.length ? '<option value="">Select Apartment / Unit</option>'+options.map(x=>`<option>${esc(x)}</option>`).join('') : '<option value="">Select a Location First</option>';
+    apartment.disabled=!options.length;
+    updateProgress();
+  }
+  function isoShift(dateString, days){
+    if(!dateString) return ''; const d=new Date(dateString+'T00:00:00'); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10);
+  }
+  function syncDateLimits(source){
+    const checkIn=byId('checkIn'), checkOut=byId('checkOut');
+    checkOut.min = checkIn.value ? isoShift(checkIn.value,1) : '';
+    checkIn.max = checkOut.value ? isoShift(checkOut.value,-1) : '';
+    if(checkIn.value && checkOut.value && nights(checkIn.value,checkOut.value)<1){
+      if(source==='checkIn') checkOut.value=''; else checkIn.value='';
+    }
+    updateProgress();
+  }
+  byId('location').addEventListener('change',populateUnits);
+  byId('checkIn').addEventListener('change',()=>syncDateLimits('checkIn'));
+  byId('checkOut').addEventListener('change',()=>syncDateLimits('checkOut'));
+
+  function updateProgress(){
+    const req = ['fullName','phone','location','apartment','checkIn','checkOut'];
+    let done = req.filter(id=>String(byId(id).value||'').trim()).length + (byId('consent').checked?1:0);
+    let pct = Math.round(done/7*100); if(pct<0) pct=0;
+    byId('progressBar').style.width = pct + '%';
+    byId('progressText').textContent = pct + '% complete';
+    const n = nights(byId('checkIn').value, byId('checkOut').value);
+    byId('slotCount').textContent = (n||1) + ' ' + ((n||1)===1 ? 'Slot' : 'Slots');
+    byId('slotExplain').textContent = n ? `${n} stay day${n===1?'':'s'} will create ${n} wheel slot${n===1?'':'s'}.` : 'Enter your stay dates to calculate your wheel slots.';
+  }
+
+  byId('entryForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    if(state.locked){ alert('Entries are locked for the draw.'); return; }
+    const fullName = byId('fullName').value.trim();
+    const phoneVal = digits(byId('phone').value).slice(0,11);
+    const email = byId('email').value.trim();
+    const location = byId('location').value;
+    const apartment = byId('apartment').value.trim();
+    const checkIn = byId('checkIn').value;
+    const checkOut = byId('checkOut').value;
+    const consent = byId('consent').checked;
+    const stayDays = nights(checkIn, checkOut);
+    if(!fullName || !location || !apartment || !consent){ alert('Please complete all required fields correctly.'); return; }
+    if(stayDays<1){ alert('Check-out date must be after the check-in date.'); return; }
+    if(!/^0\d{10}$/.test(phoneVal)){ alert('Phone number must be 11 digits in Nigerian format, for example 08012345678.'); return; }
+    try{
+      const data=await apiCall('submit_entry',{fullName,phone:phoneVal,email,location,apartment,checkIn,checkOut,days:stayDays},'');
+      const entry=rowToEntry(data.entry); state.entries=state.entries.filter(x=>x.id!==entry.id);state.entries.unshift(entry);save();
+      byId('entryForm').reset();populateUnits();byId('checkIn').max='';byId('checkOut').min='';updateProgress();
+      byId('entryCode').textContent=entry.id;byId('successCard').classList.add('show');showScreen('enterScreen');
+    }catch(err){alert(err.message||'Unable to submit your verification right now.');}
+  });
+
+  function cryptoShuffle(items){
+    const a=[...items];
+    for(let i=a.length-1;i>0;i--){const j=randomInt(i+1), t=a[i];a[i]=a[j];a[j]=t;}
+    return a;
+  }
+  function spreadTicketGroups(entries){
+    let groups=cryptoShuffle(entries.map(x=>{const n=Math.max(1,Number(x.days)||1);return{entry:x,weight:n,remaining:n,current:randomInt(1000000)/1000000}})), tickets=[], lastId='';
+    while(groups.some(g=>g.remaining>0)){
+      const active=groups.filter(g=>g.remaining>0), totalWeight=active.reduce((s,g)=>s+g.weight,0);
+      active.forEach(g=>g.current+=g.weight);
+      let candidates=active.filter(g=>g.entry.id!==lastId); if(!candidates.length)candidates=active;
+      const max=Math.max(...candidates.map(g=>g.current)), top=candidates.filter(g=>Math.abs(g.current-max)<1e-9), chosen=top[randomInt(top.length)];
+      chosen.current-=totalWeight; const placed=chosen.weight-chosen.remaining+1, x=chosen.entry;
+      tickets.push({entryId:x.id,label:x.fullName,location:x.location,slot:placed,total:chosen.weight,days:x.days});
+      chosen.remaining--; lastId=x.id;
+    }
+    if(tickets.length>3 && tickets[0].entryId===tickets[tickets.length-1].entryId){
+      const candidates=[];
+      for(let i=1;i<tickets.length-1;i++){const repl=tickets[tickets.length-1];if(tickets[i].entryId!==tickets[0].entryId&&tickets[i-1].entryId!==repl.entryId&&tickets[i+1].entryId!==repl.entryId)candidates.push(i)}
+      if(candidates.length){const i=candidates[randomInt(candidates.length)],tmp=tickets[i];tickets[i]=tickets[tickets.length-1];tickets[tickets.length-1]=tmp;}
+    }
+    if(tickets.length>1){const off=randomInt(tickets.length);tickets=tickets.slice(off).concat(tickets.slice(0,off));}
+    return tickets;
+  }
+  function eligibleEntries(){
+    const won=new Set(state.results.map(r=>r.id));
+    return state.entries.filter(x=>x.status==='verified'&&!won.has(x.id));
+  }
+  function buildTickets(force=false){
+    const eligible=eligibleEntries(), signature=eligible.map(x=>`${x.id}:${Math.max(1,Number(x.days)||1)}`).sort().join('|');
+    if(!force && signature===currentTicketSignature && currentTickets.length) return currentTickets;
+    currentTicketSignature=signature; currentTickets=spreadTicketGroups(eligible); return currentTickets;
+  }
+  function guestColor(id){let h=0;for(let i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0;return COLORS[h%COLORS.length]}
+
+  function shortLabel(name){
+    const first = String(name).trim().split(/\s+/)[0] || 'Guest';
+    return first.length>10 ? first.slice(0,10) : first;
+  }
+  function drawWheel(canvas, tickets){
+    const ctx=canvas.getContext('2d'), dpr=Math.min(window.devicePixelRatio||1,2), css=canvas.getBoundingClientRect().width||360, size=Math.max(620,Math.round(css*dpr));
+    if(canvas.width!==size||canvas.height!==size){canvas.width=size;canvas.height=size}
+    ctx.clearRect(0,0,size,size); const cx=size/2,cy=size/2,r=size*.49;
+    if(!tickets.length){ctx.beginPath();ctx.fillStyle='#fff';ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();ctx.fillStyle='#666';ctx.textAlign='center';ctx.font=`800 ${size*.045}px Arial`;ctx.fillText('No Wheel Slots Yet',cx,cy-5);ctx.font=`500 ${size*.027}px Arial`;ctx.fillText('Verify entries to build the wheel',cx,cy+30);return;}
+    const arc=Math.PI*2/tickets.length; ctx.save();ctx.translate(cx,cy);
+    tickets.forEach((t,i)=>{
+      const a0=-Math.PI/2+i*arc,a1=a0+arc;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,a0,a1);ctx.closePath();ctx.fillStyle=guestColor(t.entryId);ctx.fill();ctx.strokeStyle='rgba(255,255,255,.62)';ctx.lineWidth=tickets.length>250?.35:1;ctx.stroke();
+      const deg=360/tickets.length;
+      if(deg>=3.2||i%Math.ceil(3.2/Math.max(deg,.01))===0){ctx.save();ctx.rotate(a0+arc/2);ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.shadowColor='rgba(0,0,0,.82)';ctx.shadowBlur=4;ctx.font=`900 ${Math.max(10,Math.min(23,size*.032))}px Arial`;let label=mask(t.label);if(label.length>16)label=label.slice(0,15)+'…';ctx.fillText(label,r-18,0);ctx.restore();}
+    });
+    ctx.beginPath();ctx.arc(0,0,r*.22,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();ctx.restore();
+  }
+
+  function renderEntries(){
+    const list = byId('entryList');
+    if(!state.entries.length){ list.innerHTML = '<div class="entryCard emptyState"><div class="entryEmptyIcon">🗂</div><div><b>No guest entries yet</b><div class="small">Verified guests will appear here in beautiful cards.</div></div></div>'; return; }
+    const wonIds=new Set(state.results.map(r=>r.id));
+    list.innerHTML = state.entries.map(entry => {
+      const hasWon=wonIds.has(entry.id), badgeClass=hasWon?'winnerTag':entry.status, badgeText=hasWon?'Winner · Slots Disabled':(entry.status==='verified'?'Verified':'Pending');
+      const note = hasWon ? 'All wheel slots removed after winning.' : (entry.status==='verified' ? 'Eligible for the next spin.' : 'Awaiting verification before entering the wheel.');
+      return `<div class="entryCard ${hasWon?'winnerDisabled':''}">
+        <div class="entryTop">
+          <div class="entryIdentity">
+            <b>${esc(entry.fullName)}</b>
+            <small>${entry.phone}</small>
+          </div>
+          <span class="tag ${badgeClass}">${badgeText}</span>
+        </div>
+        <div class="entryChips">
+          <span class="entryChip">📍 ${esc(entry.location)}</span>
+          <span class="entryChip">🏠 ${esc(entry.apartment)}</span>
+          <span class="entryChip hot">🌙 ${entry.days} Stay Day${entry.days===1?'':'s'}</span>
+        </div>
+        <div class="entryNote ${hasWon?'winnerNote':''}">${note}</div>
+        <div class="entryActions">
+          <button class="btn entryAction toggleBtn" data-id="${esc(entry.id)}" ${(state.locked||spinning||hasWon)?'disabled':''}>${entry.status==='verified'?'Unverify':'Verify Entry'}</button>
+        </div>
+      </div>`;
+    }).join('');
+    $$('.toggleBtn').forEach(btn => btn.onclick = async()=>{
+      const x=state.entries.find(e=>e.id===btn.dataset.id);if(!x||state.locked||spinning)return;
+      try{await apiCall('set_status',{id:x.id,status:x.status==='verified'?'pending':'verified'});await refreshEntriesFromServer();await publishLiveState();}
+      catch(err){alert(err.message||'Unable to update guest.');}
+    });
+  }
+
+  function renderResults(){
+    const resultList = byId('resultList');
+    if(!state.results.length){ resultList.innerHTML=''; return; }
+    resultList.innerHTML = state.results.map((w,i)=>`
+      <div class="winner"><div class="winnerPos">${i+1}</div><div><b>${esc(mask(w.fullName))}</b><br><span class="small">${esc(w.location)} · ${w.days} original slot${w.days===1?'':'s'}</span></div><div class="winnerPrize">${esc(w.prize)}</div></div>
+    `).join('');
+  }
+
+  function render(){
+    const verified = state.entries.filter(x=>x.status==='verified').length;
+    const tickets = buildTickets();
+    byId('entryCount').textContent = state.entries.length;
+    byId('entryCollapseMeta').textContent = `${state.entries.length} guest${state.entries.length===1?'':'s'} · ${state.entries.filter(x=>x.status==='verified').length} verified`;
+    byId('verifiedCount').textContent = verified;
+    byId('wheelSlots').textContent = tickets.length;
+    byId('hubSlots').textContent = `${tickets.length} slot${tickets.length===1?'':'s'}`;
+    byId('drawBadge').textContent = state.results.length>=8 ? 'Draw Completed' : state.locked ? 'Entries Locked' : 'Entries Open';
+    byId('drawBadge').className = 'tag ' + (state.locked || state.results.length>=8 ? 'pending':'verified');
+    byId('nextPrize').textContent = PRIZES[state.results.length] || 'Completed';
+    byId('spinProgress').textContent = `${state.results.length} / 8`;
+    byId('ticketStream').innerHTML = tickets.length ? tickets.map((t,i)=>`<b>${i+1}.</b> ${esc(shortLabel(t.label))}`).join(' • ') : 'Verify yourself to appear on the wheel';
+    drawWheel(byId('mainCanvas'), tickets);
+    const publicRealTickets=Array.isArray(remoteLiveState.tickets)?remoteLiveState.tickets:tickets;
+    const publicVisualTickets=publicRealTickets.length?publicRealTickets:PRELOAD_APARTMENTS;
+    if(!(spinning&&adminOpen)) drawWheel(byId('watchCanvas'), publicVisualTickets);
+    const publicWinnerRows=Array.isArray(remoteLiveState.winners)&&remoteLiveState.winners.length?remoteLiveState.winners:publicWinners();
+    byId('livePrize').textContent = PRIZES[publicWinnerRows.length] || 'Completed';
+    byId('liveProgress').textContent = `${publicWinnerRows.length} / 8`;
+    byId('liveSlots').textContent = publicRealTickets.length;
+    byId('watchHubSlots').textContent = publicRealTickets.length?`${publicRealTickets.length} slot${publicRealTickets.length===1?'':'s'}`:'25 apartments';
+    if(publicWinnerRows.length){
+      const latest=publicWinnerRows[publicWinnerRows.length-1];
+      byId('watchLatestWinner').textContent=`${latest.name||mask(latest.fullName||'Guest')} won ${latest.prize}`;
+      byId('watchWinnerList').innerHTML=publicWinnerRows.map((w,i)=>`<div class="publicWinner"><b>${i+1}. ${esc(w.name||mask(w.fullName||'Guest'))}</b><span>${esc(w.prize||'')}</span></div>`).join('');
+    }else{
+      byId('watchLatestWinner').textContent=publicRealTickets.length?'Waiting for the official spin...':'Verify yourself to appear on the wheel';
+      byId('watchWinnerList').innerHTML='';
+    }
+    renderEntries(); renderResults();
+    byId('verifyAllBtn').disabled = state.locked || spinning;
+    byId('lockBtn').disabled = state.results.length>0 || spinning;
+    byId('prepareBtn').disabled = eligibleEntries().length < Math.max(1, 8-state.results.length) || state.results.length>=8 || spinning;
+    byId('spinBtn').disabled = true;
+  }
+
+  byId('entryCollapseBtn').onclick = ()=>{
+    const wrap=byId('entryListWrap'),btn=byId('entryCollapseBtn'),open=wrap.classList.toggle('open');
+    btn.setAttribute('aria-expanded',String(open));
+  };
+
+  byId('verifyAllBtn').onclick = async()=>{if(state.locked||spinning)return;try{const d=await apiCall('verify_all');state.entries=(d.entries||[]).map(rowToEntry);rebuildResults();save();await publishLiveState();}catch(err){alert(err.message||'Unable to verify entries.');}};
+  byId('lockBtn').onclick = async()=>{if(state.results.length||spinning)return;state.locked=!state.locked;save();await publishLiveState();};
+  byId('clearBtn').onclick = async()=>{if(prompt('Type CLEAR ALL')!=='CLEAR ALL')return;try{await apiCall('clear_all');state={entries:[],locked:false,results:[],log:[]};remoteLiveState={status:'idle',locked:false,tickets:[],winners:[],spinPlan:null};localStorage.removeItem(KEY);save();wheelRotation=0;byId('mainRotor').style.transform='rotate(0deg)';byId('watchRotor').style.transform='rotate(0deg)';}catch(err){alert(err.message||'Unable to clear data.');}};
+  byId('openLiveBtn').onclick = ()=> window.open(location.href.split('#')[0]+'#live','_blank','noopener');
+  byId('exportBtn').onclick = ()=>{
+    const rows = [['ID','Full Name','Phone','Email','Location','Apartment','Check-In','Check-Out','Stay Days','Status'],
+      ...state.entries.map(e=>[e.id,e.fullName,e.phone,e.email,e.location,e.apartment,e.checkIn,e.checkOut,e.days,e.status])];
+    const csv = rows.map(r=>r.map(x=>`"${String(x??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv],{type:'text/csv'}), url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href=url; a.download='guest-rewards-entries.csv'; a.click(); URL.revokeObjectURL(url);
+  };
+  byId('demoBtn').onclick = async()=>{if(state.locked||spinning)return;try{const d=await apiCall('add_demo');state.entries=(d.entries||[]).map(rowToEntry);rebuildResults();save();await publishLiveState();}catch(err){alert(err.message||'Unable to add demo entries.');}};
+
+  byId('prepareBtn').onclick = ()=>{
+    const need = 8 - state.results.length;
+    if(eligibleEntries().length < need) return alert(`At least ${need} unique verified guests are required for the remaining winner slots.`);
+    state.locked = true; save(); publishLiveState();
+    byId('confirmBox').classList.add('show'); byId('confirmInput').value=''; byId('confirmInput').focus();
+  };
+  byId('confirmInput').addEventListener('input', ()=>{ byId('spinBtn').disabled = byId('confirmInput').value.trim().toUpperCase() !== 'SPIN NOW' || spinning; });
+
+  function randomInt(max){
+    if(max<=0) return 0;
+    if(window.crypto && crypto.getRandomValues){
+      const limit = Math.floor(0x100000000/max)*max, x = new Uint32Array(1);
+      do{ crypto.getRandomValues(x); }while(x[0]>=limit);
+      return x[0]%max;
+    }
+    return Math.floor(Math.random()*max);
+  }
+  function ensureAudio(){
+    if(!soundEnabled) return null;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return null;
+    if(!audioCtx) audioCtx = new AC();
+    if(audioCtx.state==='suspended') audioCtx.resume();
+    return audioCtx;
+  }
+  function makeNoiseBuffer(ctx, seconds=1.2){
+    const len=Math.max(1,Math.floor(ctx.sampleRate*seconds)), b=ctx.createBuffer(1,len,ctx.sampleRate), d=b.getChannelData(0);
+    for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
+    return b;
+  }
+  function startSpinSound(){
+    const ctx=ensureAudio(); if(!ctx) return; stopSpinSound(true);
+    engineOsc=ctx.createOscillator(); engineOsc.type='sawtooth'; engineGain=ctx.createGain();
+    const filter=ctx.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value=420;
+    engineGain.gain.value=.0001; engineOsc.connect(filter).connect(engineGain).connect(ctx.destination); engineOsc.frequency.value=38; engineOsc.start();
+    noiseSource=ctx.createBufferSource(); noiseSource.buffer=makeNoiseBuffer(ctx); noiseSource.loop=true;
+    const nf=ctx.createBiquadFilter(); nf.type='bandpass'; nf.frequency.value=240; nf.Q.value=.7;
+    noiseGain=ctx.createGain(); noiseGain.gain.value=.0001; noiseSource.connect(nf).connect(noiseGain).connect(ctx.destination); noiseSource._filter=nf; noiseSource.start();
+  }
+  function updateSpinSound(speed, phase){
+    if(!audioCtx||!soundEnabled) return;
+    const now=audioCtx.currentTime, ratio=Math.max(0,Math.min(1,speed/260));
+    if(engineOsc){engineOsc.frequency.setTargetAtTime(36+ratio*128,now,.035);engineGain.gain.setTargetAtTime(.012+ratio*.045,now,.04)}
+    if(noiseSource&&noiseGain){noiseSource._filter.frequency.setTargetAtTime(170+ratio*1500,now,.04);noiseGain.gain.setTargetAtTime(.006+ratio*.034,now,.05)}
+    if(phase==='brake'&&engineOsc) engineOsc.detune.setTargetAtTime(-220*(1-ratio),now,.05);
+  }
+  function stopSpinSound(immediate=false){
+    if(!audioCtx) return; const now=audioCtx.currentTime, fade=immediate?.01:.3;
+    [engineGain,noiseGain].forEach(g=>{if(g){try{g.gain.cancelScheduledValues(now);g.gain.setValueAtTime(Math.max(.0001,g.gain.value),now);g.gain.exponentialRampToValueAtTime(.0001,now+fade)}catch{}}});
+    [engineOsc,noiseSource].forEach(s=>{if(s){try{s.stop(now+fade+.04)}catch{}}}); engineOsc=engineGain=noiseSource=noiseGain=null;
+  }
+  function playTick(power=1){
+    const ctx=ensureAudio(); if(!ctx) return; const now=ctx.currentTime, o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='square';o.frequency.setValueAtTime(920+power*520,now);o.frequency.exponentialRampToValueAtTime(330,now+.035);
+    g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.018+power*.018,now+.003);g.gain.exponentialRampToValueAtTime(.0001,now+.052);
+    o.connect(g).connect(ctx.destination);o.start(now);o.stop(now+.06);
+  }
+  function playFanfare(){
+    const ctx=ensureAudio(); if(!ctx) return; const now=ctx.currentTime;
+    [[523.25,0],[659.25,.09],[783.99,.18],[1046.5,.34]].forEach(([freq,delay],i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=i===3?'triangle':'sine';o.frequency.value=freq;g.gain.setValueAtTime(.0001,now+delay);g.gain.exponentialRampToValueAtTime(i===3?.17:.11,now+delay+.025);g.gain.exponentialRampToValueAtTime(.0001,now+delay+.75);o.connect(g).connect(ctx.destination);o.start(now+delay);o.stop(now+delay+.8)});
+    const boom=ctx.createOscillator(),bg=ctx.createGain();boom.type='sine';boom.frequency.setValueAtTime(120,now);boom.frequency.exponentialRampToValueAtTime(42,now+.45);bg.gain.setValueAtTime(.2,now);bg.gain.exponentialRampToValueAtTime(.0001,now+.48);boom.connect(bg).connect(ctx.destination);boom.start(now);boom.stop(now+.5);
+  }
+  function pointerTick(final=false){
+    ['wheelStage','watchWheelStage'].forEach(id=>{const stage=byId(id);if(!stage)return;const p=stage.querySelector('.pointer');p.classList.remove('tick','finalTick');void p.offsetWidth;p.classList.add(final?'finalTick':'tick');setTimeout(()=>p.classList.remove(final?'finalTick':'tick'),final?600:120)});
+  }
+  function getNextDrawAt(){
+    let target = Number(localStorage.getItem(NEXT_DRAW_KEY) || 0);
+    const now = Date.now();
+    if(!target || target <= now){
+      target = now + NEXT_DRAW_INTERVAL;
+      localStorage.setItem(NEXT_DRAW_KEY, String(target));
+    }
+    return target;
+  }
+  function formatCountdown(ms){
+    const total = Math.max(0, Math.floor(ms / 1000));
+    const days = Math.floor(total / 86400);
+    const hours = Math.floor((total % 86400) / 3600);
+    const mins = Math.floor((total % 3600) / 60);
+    const secs = total % 60;
+    const hh = String(hours + days * 24).padStart(2,'0');
+    return `${hh}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+  }
+  function updateNextDrawCountdown(){
+    const el = byId('nextDrawCountdown');
+    const label = byId('nextDrawLabel');
+    if(!el || !label) return;
+    if(spinning){
+      label.textContent = 'Draw Live Now';
+      el.textContent = 'SPINNING';
+      return;
+    }
+    let target = getNextDrawAt();
+    let remaining = target - Date.now();
+    if(remaining <= 0){
+      target = Date.now() + NEXT_DRAW_INTERVAL;
+      localStorage.setItem(NEXT_DRAW_KEY, String(target));
+      remaining = NEXT_DRAW_INTERVAL;
+    }
+    label.textContent = 'Next Draw In';
+    el.textContent = formatCountdown(remaining);
+  }
+  setInterval(updateNextDrawCountdown, 1000);
+
+  function setTelemetry(speed, phase, phaseKey=''){
+    const s=Math.max(0,Math.min(260,Math.round(speed)));
+    byId('speedReadout').textContent=`${s} KM/H`; byId('phaseText').textContent=phase; byId('speedBar').style.width=(s/260*100)+'%';
+    byId('liveSpeedReadout').textContent=`${s} KM/H`; byId('livePhaseText').textContent=phase; byId('liveSpeedBar').style.width=(s/260*100)+'%';
+    const active=phaseKey==='accel'||phaseKey==='cruise'||phaseKey==='brake';
+    byId('liveDot').classList.toggle('on',active);
+    byId('liveState').textContent=active?'Official wheel is spinning live':phase==='Winner locked'?'Winner confirmed':'Waiting for the next official spin';
+    updateNextDrawCountdown();
+    ['wheelStage','watchWheelStage'].forEach(id=>{const el=byId(id);if(el){el.classList.toggle('spinning',active);el.classList.toggle('braking',phaseKey==='brake')}});
+  }
+
+  function spinForWinner(){
+    if(spinning||state.results.length>=8) return;
+    const tickets=buildTickets(), eligibleIds=new Set(tickets.map(t=>t.entryId));
+    if(!tickets.length) return;
+    if(eligibleIds.size < 8-state.results.length) return alert('Not enough unique verified guests remain.');
+    spinning=true; byId('spinBtn').disabled=true; byId('prepareBtn').disabled=true; byId('confirmBox').classList.remove('show');
+    const winnerIndex=randomInt(tickets.length), selected=tickets[winnerIndex], slice=360/tickets.length;
+    const target=((-(winnerIndex+.5)*slice)%360+360)%360, current=((wheelRotation%360)+360)%360, turns=28+randomInt(8);
+    const totalDelta=(target-current+360)%360+turns*360, startAngle=wheelRotation;
+    const TA=10000,TC=5000,TD=15000,total=TA+TC+TD,w=totalDelta/(TA/2+TC+TD/3),dA=w*TA/2,dC=w*TC,dD=w*TD/3;
+    const start=performance.now(), rotor=byId('mainRotor'),publicRotor=byId('watchRotor'); lastTickBoundary=Math.floor(startAngle/slice);lastTickTime=0;
+    const spinPlan={id:'SPIN-'+Date.now()+'-'+randomInt(99999),startAt:Date.now(),startAngle,totalDelta,TA,TC,TD,tickets:publicTickets(),prize:PRIZES[state.results.length]};
+    remoteLiveState={status:'spinning',locked:true,tickets:spinPlan.tickets,winners:publicWinners(),spinPlan};
+    publishLiveState(remoteLiveState);
+    startSpinSound();setTelemetry(0,'Accelerating · 10 seconds','accel'); if(liveChannel) liveChannel.postMessage({type:'spin-start',tickets,prize:PRIZES[state.results.length],rotation:startAngle});
+
+    function frame(now){
+      const elapsed=Math.min(total,now-start); let angle,speed,label,phase;
+      if(elapsed<TA){const p=elapsed/TA,remain=Math.max(0,Math.ceil((TA-elapsed)/1000));angle=startAngle+dA*p*p;speed=259*p;label=speed<70?`Building momentum · ${remain}s`:speed<180?`Accelerating hard · ${remain}s`:`Approaching 259 KM/H · ${remain}s`;phase='accel';}
+      else if(elapsed<TA+TC){const p=(elapsed-TA)/TC,remain=Math.max(0,Math.ceil((TA+TC-elapsed)/1000));angle=startAngle+dA+dC*p;speed=259;label=`Full-speed spin · ${remain}s`;phase='cruise';}
+      else{const p=(elapsed-TA-TC)/TD,remain=Math.max(0,Math.ceil((total-elapsed)/1000));angle=startAngle+dA+dC+dD*(1-Math.pow(1-p,3));speed=260*Math.pow(1-p,2);label=p<.16?`260 KM/H — BRAKING! · ${remain}s`:p<.58?'':p<.86?`Locking onto a name · ${remain}s`:`Final ticks · ${remain}s`;phase='brake';}
+      wheelRotation=angle;rotor.style.transform=`rotate(${angle}deg)`;publicRotor.style.transform=`rotate(${angle}deg)`;setTelemetry(speed,label,phase);updateSpinSound(speed,phase);if(liveChannel)liveChannel.postMessage({type:'spin-frame',angle,speed,label,phase});
+      const boundary=Math.floor(angle/slice),minGap=speed>210?24:speed>100?38:60;
+      if(boundary!==lastTickBoundary&&now-lastTickTime>minGap){lastTickBoundary=boundary;lastTickTime=now;pointerTick(false);playTick(Math.max(.18,1-speed/360));}
+      if(elapsed<total) spinRAF=requestAnimationFrame(frame); else completeSpin();
+    }
+
+    async function completeSpin(){
+      wheelRotation=startAngle+totalDelta;rotor.style.transform=`rotate(${wheelRotation}deg)`;publicRotor.style.transform=`rotate(${wheelRotation}deg)`;stopSpinSound();setTelemetry(0,'Winner locked','');pointerTick(true);playTick(1.5);
+      await new Promise(r=>setTimeout(r,700));
+      const winner=state.entries.find(e=>e.id===selected.entryId),prize=PRIZES[state.results.length]||'Prize';
+      try{await apiCall('mark_winner',{id:winner.id,prize});}catch(err){console.warn('Winner sync failed',err);}
+      winner.wonAt=new Date().toISOString();winner.prize=prize;state.results.push({...winner,prize,wonAt:winner.wonAt});state.log.push({time:new Date().toISOString(),prize,winnerId:winner.id,slot:winnerIndex+1,pool:tickets.length});
+      localStorage.setItem(KEY,JSON.stringify(state));currentTicketSignature='';currentTickets=[];
+      const remainingTickets=publicTickets();remoteLiveState={status:'winner',locked:true,tickets:remainingTickets,winners:publicWinners(),spinPlan:null};await publishLiveState(remoteLiveState);
+      byId('watchLatestWinner').textContent=`${mask(winner.fullName)} won ${prize}`;
+      byId('watchWinnerList').innerHTML=state.results.map((w,i)=>`<div class="publicWinner"><b>${i+1}. ${esc(mask(w.fullName))}</b><span>${esc(w.prize)}</span></div>`).join('');
+      if(liveChannel)liveChannel.postMessage({type:'winner',winner:{name:mask(winner.fullName),prize},state});
+      byId('confirmInput').value='';showWinner(winner,prize,winnerIndex,tickets.length);
+    }
+    spinRAF=requestAnimationFrame(frame);
+  }
+  byId('spinBtn').onclick = spinForWinner;
+
+  function showWinner(winner, prize, selectedIndex, totalSlots){
+    byId('winnerName').textContent = mask(winner.fullName);
+    byId('winnerPrize').textContent = prize;
+    byId('winnerMeta').textContent = `We will reach out to you for details of where to transfer the funds.`;
+    byId('winnerOverlay').classList.add('show');
+    burstConfetti(); playFanfare();
+  }
+  function burstConfetti(){
+    const box = byId('confetti'); box.innerHTML='';
+    const colors = ['#c90000','#f0bc33','#111114','#ffffff','#ff7b7b'];
+    for(let i=0;i<110;i++){
+      const p = document.createElement('i');
+      p.style.left = (Math.random()*100)+'%';
+      p.style.background = colors[i%colors.length];
+      p.style.transform = `translateY(-20px) rotate(${Math.random()*60}deg)`;
+      p.style.animationDelay = (Math.random()*.3)+'s';
+      p.style.animationDuration = (1.8 + Math.random()*1.4)+'s';
+      box.appendChild(p);
+    }
+  }
+  byId('nextSpinBtn').onclick = ()=>{
+    byId('winnerOverlay').classList.remove('show'); spinning=false; currentTicketSignature=''; currentTickets=[]; wheelRotation=0; cancelAnimationFrame(spinRAF); byId('mainRotor').style.transform='rotate(0deg)'; byId('watchRotor').style.transform='rotate(0deg)'; setTelemetry(0,'Ready for ignition',''); render(); publishLiveState({status:'idle',spinPlan:null});
+    if(state.results.length < 8){ byId('confirmBox').classList.add('show'); setTimeout(()=>byId('confirmInput').focus(),100); }
+  };
+
+  function startHomeDemo(){
+    const demoTickets=HOME_DEMO_NAMES.map((name,i)=>({entryId:'HOME-'+i,label:name,location:LOCATIONS[i%LOCATIONS.length],days:1}));
+    drawWheel(byId('homeCanvas'),demoTickets);
+    const rotor=byId('homeRotor'), stage=byId('homeWheelStage');
+    function spin(){
+      const index=randomInt(demoTickets.length),slice=360/demoTickets.length,target=((-(index+.5)*slice)%360+360)%360,current=((demoRotation%360)+360)%360;
+      demoRotation += ((target-current+360)%360)+(8+randomInt(4))*360;
+      stage.classList.add('spinning');byId('homeDemoWinner').textContent='Spinning...';rotor.style.transform=`rotate(${demoRotation}deg)`;
+      setTimeout(()=>{stage.classList.remove('spinning');pointerTickHome();byId('homeDemoWinner').textContent=`${mask(demoTickets[index].label)} wins a guest reward`;},4200);
+    }
+    function pointerTickHome(){const p=stage.querySelector('.pointer');p.classList.remove('finalTick');void p.offsetWidth;p.classList.add('finalTick');setTimeout(()=>p.classList.remove('finalTick'),600)}
+    spin();demoTimer=setInterval(spin,7600);
+  }
+
+  if(liveChannel){
+    liveChannel.onmessage = event=>{
+      const m=event.data||{};
+      if(m.type==='spin-start'){
+        drawWheel(byId('watchCanvas'),m.tickets||[]);byId('livePrize').textContent=m.prize||'';byId('liveDot').classList.add('on');
+        startSpinSound();
+      }else if(m.type==='spin-frame'){
+        byId('watchRotor').style.transform=`rotate(${m.angle||0}deg)`;setTelemetry(m.speed||0,m.label||'Live spin',m.phase||'');
+        updateSpinSound(m.speed||0,m.phase||'');
+      }else if(m.type==='winner'){
+        stopSpinSound();state=m.state||state;localStorage.setItem(KEY,JSON.stringify(state));currentTicketSignature='';currentTickets=[];render();pointerTick(true);playFanfare();
+      }
+    };
+  }
+  window.addEventListener('storage',e=>{if(e.key===KEY){state=load();currentTicketSignature='';currentTickets=[];render();}});
+
+  function routeFromHash(){
+    const id={ '#enter':'enterScreen','#live':'watchScreen','#admin':'drawScreen','#home':'homeScreen'}[location.hash]||'homeScreen';
+    showScreen(id,false);
+  }
+  window.addEventListener('hashchange',routeFromHash);
+
+  document.addEventListener('pointerdown',()=>{try{ensureAudio()}catch{}},{once:true});
+  setInterval(fetchLiveState,500);
+  setInterval(()=>{if(adminOpen&&!spinning)refreshEntriesFromServer().catch(()=>{});},3000);
+  populateUnits(); updateProgress(); render(); startHomeDemo(); fetchLiveState(); routeFromHash();
+})();
+</script>
+</body>
+</html>
