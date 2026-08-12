@@ -2,30 +2,468 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#c90000">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="apple-touch-icon" href="./favicon.svg">
 <title>Guest Rewards Spinwheel App</title>
-<style>html,body{margin:0;min-height:100%;background:#f6f6f8;font-family:Arial,Helvetica,sans-serif}.boot{min-height:100vh;display:grid;place-items:center;text-align:center;color:#222}.boot b{display:block;font-size:1.15rem}.boot span{display:block;margin-top:8px;color:#777;font-size:.85rem}.loader{width:50px;height:50px;margin:0 auto 16px;border-radius:50%;border:5px solid #eee;border-top-color:#c90000;animation:s .8s linear infinite}@keyframes s{to{transform:rotate(360deg)}}</style>
+<style>
+:root{
+  --red:#c90000;--red2:#8f0000;--black:#111114;--gold:#f0bc33;--gold2:#a66c00;
+  --muted:#70707a;--line:#ececf1;--bg:#f6f6f8;--card:#ffffff;--green:#0f9f61;
+  --shadow:0 14px 40px rgba(18,18,28,.10);--radius:24px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--black);font-family:Inter,Arial,Helvetica,sans-serif}
+body{padding-bottom:92px}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{max-width:430px;margin:0 auto;min-height:100dvh;background:var(--bg)}
+.topbar{position:sticky;top:0;z-index:50;height:70px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;background:rgba(246,246,248,.86);backdrop-filter:blur(18px);border-bottom:1px solid rgba(220,220,227,.75)}
+.brand{display:flex;gap:10px;align-items:center}.brandmark{width:42px;height:42px;border-radius:14px;background:linear-gradient(145deg,var(--red),var(--red2));color:#fff;display:grid;place-items:center;font:950 1.35rem Impact,"Arial Black",sans-serif;box-shadow:0 9px 20px rgba(201,0,0,.22),inset 1px 1px 0 rgba(255,255,255,.18)}.brandtext b{display:block;font-size:.93rem}.brandtext small{display:block;color:var(--muted);font-size:.68rem;margin-top:2px;text-transform:uppercase;font-weight:850;letter-spacing:.05em}
+.screen{display:none;padding:16px}.screen.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero{padding:22px;background:linear-gradient(145deg,#fff,#fff8f8)}.h1{margin:0;font:950 3rem/.9 Impact,"Arial Black",sans-serif;text-transform:uppercase;letter-spacing:-.04em}.h1 .red{color:var(--red)}.sub{margin:12px 0 0;color:#62626d;line-height:1.55;font-size:.92rem}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.pill{padding:8px 10px;border-radius:999px;background:#fff;border:1px solid #e5e5eb;font-size:.72rem;font-weight:850;color:#4b4b55}
+.ctaRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.btn{border:0;border-radius:16px;min-height:48px;padding:0 18px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn.primary{background:linear-gradient(145deg,var(--red),var(--red2));color:#fff}.btn.soft{background:#f2f2f6;color:#26262d}.btn.gold{background:linear-gradient(145deg,#ffd966,#d99f15);color:#1a1300}.btn.dark{background:#17171a;color:#fff}.btn.outline{border:1px solid #dcdce5;background:#fff;color:#2a2a31}.btn:disabled{opacity:.45;cursor:not-allowed}
+.stack{display:grid;gap:14px;margin-top:14px}.stack3{display:grid;gap:14px}.prizeCard{padding:18px;background:linear-gradient(145deg,#19191d,#050506);color:#fff}.prizeTitle{font-size:.77rem;text-transform:uppercase;font-weight:900;letter-spacing:.08em;color:#dadade;text-align:center}.prizeRow{margin-top:10px;padding:12px 13px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);border-radius:15px;display:flex;align-items:center;justify-content:space-between;gap:10px}.prizeAmount{font:900 1.18rem Georgia,serif;color:var(--gold)}.prizeMeta{font-size:.72rem;color:#ccc;font-weight:800}
+.info{padding:18px}.info h3{margin:0 0 8px;font-size:1rem}.info p{margin:0;color:#686872;font-size:.86rem;line-height:1.55}
+.formCard{padding:18px}.formTitle{margin:0 0 4px;font-size:1.25rem}.small{color:var(--muted);font-size:.78rem;line-height:1.45}.progressWrap{margin-top:14px}.progressTrack{height:10px;background:#efeff4;border-radius:999px;overflow:hidden}.progressBar{height:100%;width:0;background:linear-gradient(90deg,var(--red),#ff6464);transition:width .25s ease}.progressText{font-size:.71rem;color:var(--muted);margin-top:6px;text-align:right;font-weight:850}
+.fields{display:grid;gap:14px;margin-top:16px}.field label{display:block;font-size:.84rem;font-weight:900;margin-bottom:6px}.field input,.field select{width:100%;height:50px;padding:0 14px;border:1px solid #d9d9e2;border-radius:14px;background:#fff;outline:none}.field input:focus,.field select:focus{border-color:var(--red);box-shadow:0 0 0 4px rgba(201,0,0,.10)}
+.check{display:flex;gap:10px;background:#fafafc;border:1px solid #e2e2e8;border-radius:14px;padding:12px}.check input{width:18px;height:18px;accent-color:var(--red);margin-top:1px}
+.derived{padding:14px;border-radius:16px;background:#fff7f7;border:1px solid #ffd5d5}.derived b{display:block;font-size:1.6rem;color:var(--red);font-family:Impact,"Arial Black",sans-serif}.success{display:none;margin-top:14px;padding:14px;border-radius:16px;background:#ecf9f2;border:1px solid #bbdfce}.success.show{display:block}.code{display:inline-block;margin-top:8px;padding:8px 10px;background:#fff;border:1px dashed #89c0a6;border-radius:10px;font-family:ui-monospace,monospace;font-weight:900}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.entryList{display:grid;gap:10px;margin-top:12px}.entryCard{padding:12px 14px;border-radius:18px;background:#fff;border:1px solid var(--line)}.entryTop{display:flex;align-items:center;justify-content:space-between;gap:10px}.entryTop b{font-size:.98rem}.entryMeta{margin-top:5px;color:var(--muted);font-size:.82rem;line-height:1.45}.tag{display:inline-flex;align-items:center;padding:7px 9px;border-radius:999px;font-size:.68rem;font-weight:900}.tag.pending{background:#fff4db;color:#8d5c00}.tag.verified{background:#e8f8ef;color:#087a49}.tag.winnerTag{background:#222228;color:#ffd86c}
+.drawGrid{display:grid;gap:14px}.drawPanel{padding:16px}.drawHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.drawHeader h2{margin:0;font-size:1.25rem}.miniStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.miniStat{padding:12px;border-radius:15px;background:#fff;border:1px solid var(--line);text-align:center}.miniStat b{display:block;font-size:1.2rem}.miniStat span{font-size:.65rem;text-transform:uppercase;font-weight:850;color:var(--muted);letter-spacing:.06em}
+.wheelArea{position:relative;width:min(100%,390px);aspect-ratio:1;margin:16px auto 0}.frame{position:absolute;inset:0;border-radius:50%;padding:12px;background:linear-gradient(145deg,#242429,#09090b);box-shadow:0 18px 40px rgba(0,0,0,.22),inset 2px 2px 0 rgba(255,255,255,.15)}.rotor{width:100%;height:100%;border-radius:50%;will-change:transform}.rotor canvas{display:block;width:100%;height:100%;border-radius:50%}.pointer{position:absolute;left:50%;top:-4px;z-index:10;width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:31px solid var(--gold);transform:translateX(-50%);filter:drop-shadow(0 3px 1px rgba(0,0,0,.35));transform-origin:50% 0}.hub{position:absolute;left:50%;top:50%;z-index:9;transform:translate(-50%,-50%);width:92px;height:92px;border-radius:50%;display:grid;place-items:center;text-align:center;background:#121215;color:#fff;border:5px solid #fff;box-shadow:0 7px 20px rgba(0,0,0,.28);font-size:.7rem;font-weight:850;text-transform:uppercase;line-height:1.1}.hub b{display:block;font-size:1rem;color:var(--gold)}
+.wheelHub{display:flex!important;flex-direction:column;justify-content:center;align-items:center;padding:9px;background:radial-gradient(circle at 34% 26%,#2c2c31 0,#151518 45%,#070708 100%);border:4px solid #f5c64a;box-shadow:0 0 0 4px rgba(0,0,0,.5),0 10px 28px rgba(0,0,0,.42),inset 0 0 0 2px rgba(255,255,255,.1)}.wheelHub .hubTop{font-size:.58rem;letter-spacing:.1em;font-weight:950;color:#f0f0f2}.wheelHub b{margin:2px 0;font-size:1rem;line-height:1;color:#ffd75a}.wheelHub small{font-size:.55rem;color:#c9c9cf;font-weight:900}.hubDot{display:inline-block;width:6px;height:6px;margin-right:4px;border-radius:50%;background:#27d980;box-shadow:0 0 10px rgba(39,217,128,.8)}
+.telemetry{margin-top:10px;padding:12px 13px;border:1px solid var(--line);border-radius:16px;background:#fff}.telemetry b{font-size:1rem}.telemetry span{display:block;margin-top:3px;font-size:.7rem;color:var(--muted);font-weight:800}.speedTrack{height:8px;border-radius:999px;background:#eeeef3;overflow:hidden;margin-top:9px}.speedBar{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--gold),var(--red));transition:width .05s linear}
+.confirmBox{display:none;margin-top:12px;padding:13px;border:1px dashed #d0d0da;border-radius:15px;background:#fbfbfd}.confirmBox.show{display:block}.confirmBox input{width:100%;height:46px;border:1px solid #dcdce4;border-radius:13px;padding:0 12px;margin-top:8px}.ticketStream{margin-top:10px;padding:11px;border-radius:14px;background:#f5f5f8;color:#686872;font-size:.72rem;line-height:1.5;max-height:90px;overflow:auto}.resultList{display:grid;gap:8px;margin-top:12px}.winner{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:15px;background:#111114;color:#fff}.winnerPos{width:32px;height:32px;border-radius:11px;display:grid;place-items:center;background:var(--red);font-weight:950}.winnerPrize{color:var(--gold);font-weight:950;font-family:Georgia,serif}
+.bottomnav{position:fixed;z-index:80;left:50%;bottom:0;transform:translateX(-50%);width:min(430px,100%);height:78px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:rgba(255,255,255,.88);backdrop-filter:blur(20px);border-top:1px solid rgba(220,220,226,.8)}.navbtn{border:0;background:transparent;border-radius:14px;color:#73737c;font-weight:800}.navbtn.active{color:var(--red);background:#fff1f1}.navbtn b{display:block;font-size:1.05rem}.navbtn small{display:block;font-size:.68rem;margin-top:2px}
+.overlay{position:fixed;z-index:150;inset:0;display:none;place-items:center;padding:20px}.overlay.show{display:grid}.scrim{position:absolute;inset:0;background:rgba(7,7,9,.82);backdrop-filter:blur(8px)}.modal{position:relative;width:min(390px,100%);padding:20px;background:#fff;border-radius:22px}.modal h3{margin:0}.modal input{width:100%;height:48px;border-radius:14px;border:1px solid #d9d9e0;padding:0 13px;margin-top:12px}.winnerSplash{position:relative;width:min(410px,100%);padding:30px 20px;text-align:center;background:radial-gradient(circle at 50% 0,#620000,#1a0000 58%,#080808 100%);border:1px solid rgba(255,255,255,.15);border-radius:28px;box-shadow:0 30px 80px rgba(0,0,0,.45);overflow:hidden;color:#fff;animation:splashIn .55s cubic-bezier(.2,.8,.2,1)}.winnerSplash h2{margin:0;font:950 3rem/.9 Impact,"Arial Black",sans-serif;text-transform:uppercase;color:#fff}.winnerSplash p{color:#ddd;font-size:.86rem;line-height:1.55}.winnerName{margin-top:16px;font:950 2.4rem/.95 Impact,"Arial Black",sans-serif;color:#fff;text-transform:uppercase;text-shadow:0 4px 0 #000}.winnerMoney{margin-top:8px;font:900 2.3rem Georgia,serif;color:var(--gold);text-shadow:0 3px 0 #704300}@keyframes splashIn{from{opacity:0;transform:scale(.72) rotate(-3deg)}to{opacity:1;transform:scale(1) rotate(0)}}.confetti{pointer-events:none;position:absolute;inset:0;overflow:hidden}.confetti i{position:absolute;top:-20px;width:10px;height:18px;border-radius:3px;opacity:.92;animation:fall 2.6s linear forwards}@keyframes fall{to{transform:translateY(115dvh) rotate(720deg);opacity:1}}
+
+.liveHeader{padding:18px;background:linear-gradient(145deg,#fff,#fff7f7)}
+.liveHeader h2{margin:0;font:950 2rem/.95 Impact,"Arial Black",sans-serif;text-transform:uppercase;letter-spacing:-.03em}
+.liveHeader h2 span{color:var(--red)}
+.liveStatus{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:12px 14px;border-radius:16px;background:#f4f4f7;border:1px solid var(--line)}
+.liveDot{width:10px;height:10px;border-radius:50%;background:#8a8a91;box-shadow:0 0 0 0 rgba(15,159,97,.5)}
+.liveDot.on{background:var(--green);animation:livePulse 1.1s infinite}@keyframes livePulse{50%{box-shadow:0 0 0 9px rgba(15,159,97,0)}}
+.liveStatusText{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:900}
+.liveConsole{padding:16px;background:linear-gradient(160deg,#121214,#050506);color:#fff;border-color:#1c1c21}
+.phaseBar{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.09)}.phaseBar span{color:#aaaab1;font-size:.72rem;text-transform:uppercase;font-weight:850}.phaseBar b{color:var(--gold)}
+.bigWheel .telemetry{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}.bigWheel .telemetry span{color:#aaaab1}.bigWheel .speedTrack{background:rgba(255,255,255,.12)}
+.publicWinnerList{display:grid;gap:8px;margin-top:12px}.publicWinner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}.publicWinner b{font-size:.8rem}.publicWinner span{font:850 .86rem Georgia,serif;color:var(--gold)}
+.liveWinnerHero{margin-top:12px;padding:15px;border-radius:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);text-align:center}
+.liveWinnerHero small{display:block;color:#d3d3db;text-transform:uppercase;letter-spacing:.08em;font-weight:850}.liveWinnerHero b{display:block;color:var(--gold);font-size:1.4rem;margin-top:5px}
+.homeDemoNote{text-align:center;color:#d5d5db;font-size:.78rem;margin:-4px 0 12px}
+
+.footerNote{padding:0 16px 20px;color:var(--muted);font-size:.76rem;line-height:1.5;text-align:center}
+@media (min-width:700px){.app{max-width:1100px;padding-bottom:30px}.topbar{padding-left:24px;padding-right:24px}.layout2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.screen{padding:24px}.h1{font-size:4rem}.stack3{display:grid;grid-template-columns:1fr 1fr;gap:16px}.entryList{grid-template-columns:1fr 1fr}.drawGrid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:start}.toolbar{margin-top:0}}
+
+/* === v5 premium UI overrides === */
+body{background:radial-gradient(circle at top left,rgba(255,245,247,.95),transparent 28%),radial-gradient(circle at top right,rgba(255,253,242,.9),transparent 22%),linear-gradient(180deg,#f8f8fb 0%,#f3f3f8 100%)}
+.card{border:1px solid rgba(255,255,255,.55);box-shadow:18px 18px 40px rgba(186,186,205,.23),-12px -12px 28px rgba(255,255,255,.88)}
+.hero,.liveHeader{background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(255,255,255,.58));backdrop-filter:blur(18px)}
+.formCard{background:linear-gradient(135deg,rgba(255,255,255,.50),rgba(255,255,255,.32));backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.65);box-shadow:22px 22px 45px rgba(201,204,217,.34),-14px -14px 28px rgba(255,255,255,.95),inset 1px 1px 0 rgba(255,255,255,.65)}
+.formTitle{font-size:1.45rem;letter-spacing:-.02em}
+.progressTrack{background:linear-gradient(145deg,#ececf3,#ffffff);box-shadow:inset 6px 6px 10px rgba(202,204,217,.55), inset -6px -6px 10px rgba(255,255,255,.85)}
+.fields{gap:16px;margin-top:18px}
+.field label{font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;color:#5f5f68}
+.field input,.field select{height:54px;border:1px solid rgba(255,255,255,.9);background:linear-gradient(145deg,rgba(255,255,255,.80),rgba(245,246,251,.86));box-shadow:inset 4px 4px 10px rgba(226,228,238,.65), inset -5px -5px 10px rgba(255,255,255,.92), 0 10px 26px rgba(194,197,212,.16)}
+.field input:focus,.field select:focus{border-color:rgba(201,0,0,.22);box-shadow:0 0 0 4px rgba(201,0,0,.08), inset 4px 4px 10px rgba(226,228,238,.65), inset -5px -5px 10px rgba(255,255,255,.92)}
+.check,.derived,.success{background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(247,247,252,.88));border:1px solid rgba(255,255,255,.86);box-shadow:12px 12px 28px rgba(201,204,218,.22),-7px -7px 18px rgba(255,255,255,.85),inset 1px 1px 0 rgba(255,255,255,.75)}
+.derived{background:linear-gradient(135deg,rgba(255,246,246,.9),rgba(255,255,255,.82))}
+.btn{position:relative;overflow:hidden;transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn.soft,.btn.outline,.glassBtn{background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(241,242,248,.94));border:1px solid rgba(255,255,255,.9);box-shadow:12px 12px 24px rgba(198,201,214,.24),-8px -8px 18px rgba(255,255,255,.92);color:#26262d}
+.btn.primary{box-shadow:0 14px 28px rgba(201,0,0,.22), inset 1px 1px 0 rgba(255,255,255,.18)}
+.btn.gold{box-shadow:0 12px 24px rgba(215,150,0,.25), inset 1px 1px 0 rgba(255,255,255,.35)}
+.btn.dark{box-shadow:0 12px 24px rgba(0,0,0,.22)}
+.toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.toolbar .btn{width:100%;justify-content:center;min-height:48px;font-size:.88rem;border-radius:18px}
+.entryList{display:grid;gap:14px;margin-top:16px}
+.entryCard{position:relative;padding:16px 16px 14px;border-radius:24px;background:linear-gradient(135deg,rgba(255,255,255,.72),rgba(250,250,253,.92));border:1px solid rgba(255,255,255,.88);box-shadow:18px 18px 32px rgba(200,203,215,.23),-10px -10px 20px rgba(255,255,255,.92),inset 1px 1px 0 rgba(255,255,255,.72)}
+.entryCard:before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:6px;border-radius:999px;background:linear-gradient(180deg,var(--red),#ff7777)}
+.entryCard.winnerDisabled{background:linear-gradient(135deg,rgba(249,249,251,.9),rgba(238,239,244,.95));opacity:1}
+.entryCard.winnerDisabled:before{background:linear-gradient(180deg,#222,#f0bc33)}
+.entryTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.entryIdentity b{display:block;font-size:1.08rem;line-height:1.05;letter-spacing:-.02em}
+.entryIdentity small{display:block;margin-top:5px;color:#767680;font-weight:800}
+.tag{padding:9px 12px;border-radius:999px;font-size:.72rem;font-weight:950;letter-spacing:.02em;box-shadow:inset 1px 1px 0 rgba(255,255,255,.3)}
+.tag.pending{background:linear-gradient(145deg,#fff4dc,#ffe7b1);color:#8f5900}
+.tag.verified{background:linear-gradient(145deg,#eaf9f0,#d6f4e4);color:#0d8650}
+.tag.winnerTag{background:linear-gradient(145deg,#2c2c31,#535358);color:#ffd55f}
+.entryChips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.entryChip{display:inline-flex;align-items:center;gap:6px;padding:9px 11px;border-radius:14px;background:rgba(255,255,255,.75);border:1px solid rgba(230,231,238,.95);font-size:.78rem;font-weight:850;color:#3b3b43;box-shadow:6px 6px 14px rgba(208,210,221,.18),-4px -4px 10px rgba(255,255,255,.8)}
+.entryChip.hot{background:linear-gradient(145deg,rgba(255,246,230,.95),rgba(255,234,195,.92));color:#8e5200}
+.entryNote{margin-top:12px;padding:11px 12px;border-radius:14px;background:rgba(248,248,252,.86);border:1px solid rgba(232,233,240,.95);color:#65656e;font-size:.79rem;line-height:1.5;font-weight:800}
+.entryNote.winnerNote{background:linear-gradient(145deg,rgba(255,250,236,.96),rgba(246,240,220,.96));color:#7b5a00}
+.entryActions{display:flex;justify-content:flex-end;margin-top:12px}
+.entryAction{min-height:44px;padding:0 16px;border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.86),rgba(242,243,248,.96));border:1px solid rgba(255,255,255,.92);box-shadow:10px 10px 18px rgba(198,201,214,.22),-6px -6px 14px rgba(255,255,255,.9);font-size:.84rem;color:#25252c}
+.entryAction:disabled{background:linear-gradient(145deg,rgba(243,244,248,.85),rgba(235,236,242,.95));opacity:.7}
+.entryCard.emptyState{display:flex;align-items:center;gap:14px;padding:20px}.entryEmptyIcon{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,#fff,#f0f0f6);box-shadow:10px 10px 20px rgba(196,198,210,.2),-6px -6px 14px rgba(255,255,255,.95);font-size:1.4rem}
+.liveStatus{background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(247,248,252,.95));box-shadow:12px 12px 28px rgba(201,204,217,.18),-8px -8px 18px rgba(255,255,255,.92)}
+.footerNote{display:none!important}
+@media (max-width:699px){.toolbar{grid-template-columns:1fr 1fr}.entryCard{padding:15px}.entryTop{flex-direction:column;align-items:flex-start}.tag{align-self:flex-start}.entryActions{justify-content:stretch}.entryAction{width:100%}}
+
+
+@media (max-width:390px){.bottomnav{gap:6px;padding-left:8px;padding-right:8px}.navbtn{padding-left:3px;padding-right:3px}.navbtn small{font-size:.64rem}}
+
+.nextDrawTimer{display:flex!important;align-items:center;gap:10px;margin-top:7px;color:#6f6f78!important;font-weight:850!important;text-transform:uppercase;letter-spacing:.06em}
+.nextDrawTimer span{font-size:.69rem}
+.nextDrawTimer strong{display:inline-flex;align-items:center;justify-content:center;min-width:92px;padding:7px 10px;border-radius:12px;background:linear-gradient(145deg,#fff0f0,#ffe1e1);color:var(--red);font-size:.9rem;letter-spacing:.08em;box-shadow:inset 1px 1px 0 rgba(255,255,255,.75),0 7px 18px rgba(201,0,0,.12);animation:countdownBlink 1s ease-in-out infinite}
+@keyframes countdownBlink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.97)}}
+
+
+/* === v9 contained collapsible guest directory === */
+#phaseText{display:none!important}
+.entryCollapseBtn{
+  width:100%;margin-top:16px;padding:14px 16px;border:1px solid rgba(255,255,255,.9);border-radius:20px;
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;text-align:left;color:#24242b;
+  background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(240,241,247,.96));
+  box-shadow:12px 12px 24px rgba(197,200,214,.23),-8px -8px 18px rgba(255,255,255,.94),inset 1px 1px 0 rgba(255,255,255,.8);
+  font:inherit;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;
+}
+.entryCollapseBtn:hover{transform:translateY(-1px);box-shadow:14px 14px 28px rgba(197,200,214,.28),-9px -9px 20px rgba(255,255,255,.96)}
+.entryCollapseIcon{width:42px;height:42px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(145deg,#fff,#eceef5);box-shadow:7px 7px 15px rgba(197,200,214,.2),-5px -5px 12px rgba(255,255,255,.95);font-size:1.15rem}
+.entryCollapseCopy b{display:block;font-size:.94rem;letter-spacing:-.01em}.entryCollapseCopy small{display:block;margin-top:3px;color:var(--muted);font-size:.74rem;font-weight:800}
+.entryCollapseChevron{font-size:1.45rem;line-height:1;transition:transform .24s ease;color:#65656d}.entryCollapseBtn[aria-expanded="false"] .entryCollapseChevron{transform:rotate(-90deg)}
+.entryListWrap{max-height:0;overflow:hidden;opacity:0;transition:max-height .38s ease,opacity .25s ease,margin .25s ease;margin-top:0}
+.entryListWrap.open{max-height:560px;overflow-y:auto;overscroll-behavior:contain;opacity:1;margin-top:12px;padding:3px 8px 14px 3px;scrollbar-width:thin;scrollbar-color:#c9c9d2 transparent}
+.entryListWrap::-webkit-scrollbar{width:8px}.entryListWrap::-webkit-scrollbar-thumb{background:#c9c9d2;border-radius:999px}.entryListWrap::-webkit-scrollbar-track{background:transparent}
+.entryList{margin-top:0!important;grid-template-columns:1fr!important}
+.entryCard{contain:content}
+@media(max-width:699px){.entryListWrap.open{max-height:430px}.entryCollapseBtn{padding:12px 13px}.entryCollapseIcon{width:38px;height:38px}}
+
+/* === v16 standalone weekly campaign === */
+#phaseText,#livePhaseText{display:none!important}
+.activeWeekPill{margin:0 auto 12px;width:max-content;max-width:100%;padding:7px 11px;border-radius:999px;background:rgba(240,188,51,.13);border:1px solid rgba(240,188,51,.3);color:#8a5b00;font-size:.7rem;font-weight:950;letter-spacing:.06em;text-transform:uppercase}
+@media (min-width:900px){#entryForm .fields{grid-template-columns:repeat(4,minmax(0,1fr))}#entryForm .field:first-child{grid-column:span 2}}
+@media (min-width:700px) and (max-width:899px){#entryForm .fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+</style>
 </head>
 <body>
-<div class="boot"><div><div class="loader"></div><b>Guest Rewards</b><span>Loading weekly rewards…</span></div></div>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brandmark">8</div>
+      <div class="brandtext"><b>Guest Rewards</b><small>Private Spinwheel Draw</small></div>
+    </div>
+  </header>
+
+  <main>
+    <section id="homeScreen" class="screen active">
+      <div class="card hero">
+        <h1 class="h1">Rewarding <span class="red">Our Guests</span></h1>
+        <p class="sub">Enter your booking details to verify you're our guest</p>
+        <div class="pills">
+          <div class="pill">No Payment Required</div>
+          <div class="pill">Verified Stays Only</div>
+          <div class="pill">Every Stay Day Becomes One Wheel Slot</div>
+          <div class="pill">8 Different Guests Must Win!</div><div class="pill">₦1M Grand Prize Requires 7+ Verified Stay Days</div>
+        </div>
+        <div class="ctaRow">
+          <button class="btn primary" id="goEnterBtn">Verify</button>
+          <button class="btn soft" id="goDrawBtn">Watch Live Draw</button>
+        </div>
+      </div>
+
+      <div class="stack3 stack">
+        <div class="card prizeCard">
+          <div class="prizeTitle">₦1.5M Monthly Guest Rewards</div>
+          <div id="activeWeekPill" class="activeWeekPill">Weekly Draw</div>
+          <div class="prizeRow"><div class="prizeAmount">Week 1</div><div class="prizeMeta">2 × ₦50K = ₦100K</div></div>
+          <div class="prizeRow"><div class="prizeAmount">Week 2</div><div class="prizeMeta">2 × ₦50K + ₦100K</div></div>
+          <div class="prizeRow"><div class="prizeAmount">Week 3</div><div class="prizeMeta">2 × ₦100K = ₦200K</div></div>
+          <div class="prizeRow"><div class="prizeAmount">Week 4</div><div class="prizeMeta">₦1M Grand Prize · 7+ Days</div></div>
+        </div>
+
+        <div id="homeWheelCard" class="card demoWheelCard">
+          <div class="prizeTitle" style="margin-bottom:6px">You Might Be Our Lucky Guest</div>
+          
+          <div id="homeWheelStage" class="wheelArea">
+            <div class="pointer"></div>
+            <div class="frame"><div id="homeRotor" class="rotor"><canvas id="homeCanvas" width="800" height="800"></canvas></div></div>
+            <div class="hub wheelHub homeHub"><span class="hubTop">GUEST</span><b>REWARDS</b><small>SPIN</small></div>
+          </div>
+          <div class="demoWinner">
+            
+            <b id="homeDemoWinner">Preparing automatic spin...</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="card info" style="margin-top:14px">
+        <h3>How the wheel works</h3>
+        <p>Each verified stay-day gives you one wheel slot for that campaign week. Once a guest wins, that guest is removed from the remaining draws for the month. The ₦1,000,000 Grand Prize requires at least 7 verified stay-days during the month.</p>
+      </div>
+    </section>
+
+    <section id="enterScreen" class="screen">
+      <div class="card formCard">
+        <h2 class="formTitle">Verify Your Booking</h2>
+        <div class="small">Enter your booking details. Once your stay is verified, your stay days determine your wheel slots.</div>
+        <div class="progressWrap">
+          <div class="progressTrack"><div id="progressBar" class="progressBar"></div></div>
+          <div id="progressText" class="progressText">0% complete</div>
+        </div>
+
+        <form id="entryForm" novalidate>
+          <div class="fields">
+            <div class="field"><label for="fullName">Full Name</label><input id="fullName" required placeholder="As used for booking"></div>
+            <div class="field"><label for="phone">Phone Number</label><input id="phone" required inputmode="numeric" maxlength="11" pattern="^0\d{10}$" placeholder="08012345678"></div>
+            <div class="field"><label for="email">Email Address</label><input id="email" type="email" placeholder="Optional"></div>
+            <div class="field"><label for="location">Location</label>
+              <select id="location" required>
+                <option value="">Select Location</option>
+                <option>Hilltop Katampe</option>
+                <option>Palmwood Jahi</option>
+                <option>Bradford Gwarinpa</option>
+                <option>Whitehouse Gwarinpa</option>
+              </select>
+            </div>
+            <div class="field"><label for="apartment">Apartment / Unit</label><select id="apartment" required disabled><option value="">Select a Location First</option></select></div>
+            <div class="field"><label for="checkIn">Check-In Date</label><input id="checkIn" type="date" required></div>
+            <div class="field"><label for="checkOut">Check-Out Date</label><input id="checkOut" type="date" required></div>
+          </div>
+
+          <div id="derived" class="derived" style="margin-top:14px">
+            <div class="small" style="margin-bottom:6px;color:#6d5454">Estimated Wheel Slots</div>
+            <b id="slotCount">1 Slot</b>
+            <div class="small" id="slotExplain">Enter your stay dates to calculate your wheel slots.</div>
+          </div>
+
+          <label class="check" style="margin-top:14px">
+            <input id="consent" type="checkbox" required>
+            <span>I confirm these booking details are correct and I permit the organiser to verify my stay for the draw.</span>
+          </label>
+
+          <div class="ctaRow" style="margin-top:16px">
+            <button type="submit" class="btn primary">Verify Booking</button>
+          </div>
+          <div class="small" style="margin-top:10px">Phone number must be an 11-digit Nigerian mobile number.</div>
+
+          <div id="successCard" class="success">
+            <b>Your entry was received.</b>
+            <div class="small" style="margin-top:4px;color:#3d6d54">Verification is pending. Keep this private entry code.</div>
+            <div id="entryCode" class="code"></div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section id="watchScreen" class="screen">
+      <div class="card liveHeader">
+        
+        <h2>Watch Winners <span>Live</span></h2>
+        <div class="liveStatus">
+          <div>
+            <div class="liveStatusText"><i id="liveDot" class="liveDot"></i><span id="liveState">Waiting for the next official spin</span></div>
+            <small id="liveStateMeta" class="nextDrawTimer"><span id="nextDrawLabel">Next Draw In</span><strong id="nextDrawCountdown">24:00:00</strong></small>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="card liveConsole" style="margin-top:14px">
+        <div class="phaseBar"><span>Current Prize</span><b id="livePrize">₦1,000,000</b></div>
+        <div class="phaseBar"><span>Winners Drawn</span><b id="liveProgress">0 / 8</b></div>
+        <div class="phaseBar"><span>Eligible Wheel Slots</span><b id="liveSlots">0</b></div>
+
+        <div class="bigWheel">
+          <div id="watchWheelStage" class="wheelArea">
+            <div class="pointer"></div>
+            <div class="frame"><div id="watchRotor" class="rotor"><canvas id="watchCanvas" width="900" height="900"></canvas></div></div>
+            <div class="hub wheelHub liveHub"><span class="hubTop"><i class="hubDot"></i>LIVE</span><b>DRAW</b><small id="watchHubSlots">25 APARTMENTS</small></div>
+          </div>
+          <div class="telemetry"><b id="liveSpeedReadout">0 KM/H</b><span id="livePhaseText">Waiting for the administrator</span><div class="speedTrack"><div id="liveSpeedBar" class="speedBar"></div></div></div>
+        </div>
+
+        <div class="liveWinnerHero">
+          <small>Latest Confirmed Winner</small>
+          <b id="watchLatestWinner">No winner has been drawn yet.</b>
+        </div>
+        <div id="watchWinnerList" class="publicWinnerList"></div>
+      </div>
+    </section>
+
+    <section id="drawScreen" class="screen">
+      <div class="miniStats">
+        <div class="miniStat"><b id="entryCount">0</b><span>Entries</span></div>
+        <div class="miniStat"><b id="verifiedCount">0</b><span>Verified</span></div>
+        <div class="miniStat"><b id="wheelSlots">0</b><span>Wheel Slots</span></div>
+      </div>
+
+      <div class="drawGrid">
+        <div class="card drawPanel">
+          <div class="drawHeader"><div><h2>Official Draw</h2><div class="small">Admin control room</div></div><span id="drawBadge" class="tag verified">Entries Open</span></div>
+          <div id="wheelStage" class="wheelArea">
+            <div class="pointer"></div>
+            <div class="frame"><div id="mainRotor" class="rotor"><canvas id="mainCanvas" width="900" height="900"></canvas></div></div>
+            <div class="hub wheelHub adminHub"><span class="hubTop">OFFICIAL</span><b>DRAW</b><small id="hubSlots">0 SLOTS</small></div>
+          </div>
+          <div class="telemetry"><b id="speedReadout">0 KM/H</b><span id="phaseText">Ready for ignition</span><div class="speedTrack"><div id="speedBar" class="speedBar"></div></div></div>
+          <div class="ticketStream" id="ticketStream">Verify guests to populate the wheel.</div>
+        </div>
+
+        <div>
+          <div class="card drawPanel">
+            <div class="phaseBar"><span>Next Prize</span><b id="nextPrize">₦50,000</b></div>
+            <div class="phaseBar"><span>Progress</span><b id="spinProgress">0 / 8</b></div>
+            <div class="toolbar">
+              <button id="verifyAllBtn" class="btn outline">Verify All</button>
+              <button id="lockBtn" class="btn outline">Lock / Unlock</button>
+              <button id="prepareBtn" class="btn dark">Prepare Spin</button>
+              <button id="openLiveBtn" class="btn outline">Open Live</button>
+              <button id="exportBtn" class="btn outline">Export CSV</button>
+              <button id="demoBtn" class="btn outline">Add Demo Guests</button>
+              <button id="clearBtn" class="btn outline">Clear All</button>
+            </div>
+
+            <div id="confirmBox" class="confirmBox">
+              <div class="small">Type <b>SPIN NOW</b> to enable the official spin.</div>
+              <input id="confirmInput" autocomplete="off" placeholder="SPIN NOW">
+              <button id="spinBtn" class="btn primary" style="width:100%;margin-top:10px" disabled>Start 30-Second Spin</button>
+            </div>
+          </div>
+
+          <div class="card drawPanel" style="margin-top:14px">
+            <div class="drawHeader"><div><h2>Guest Directory</h2><div class="small">Contained list · tap to expand</div></div></div>
+            <button id="entryCollapseBtn" class="entryCollapseBtn" type="button" aria-expanded="false">
+              <span class="entryCollapseIcon">👥</span><span class="entryCollapseCopy"><b>View Guest Entries</b><small id="entryCollapseMeta">0 guests · 0 verified</small></span><span class="entryCollapseChevron">⌄</span>
+            </button>
+            <div id="entryListWrap" class="entryListWrap"><div id="entryList" class="entryList"></div></div>
+          </div>
+          <div class="card drawPanel" style="margin-top:14px"><div class="drawHeader"><div><h2>Confirmed Winners</h2><div class="small">Winner slots are automatically removed</div></div></div><div id="resultList" class="resultList"></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="bottomnav">
+  <button class="navbtn active" data-screen="homeScreen"><b>⌂</b><small>Home</small></button>
+  <button class="navbtn" data-screen="enterScreen"><b>＋</b><small>Verify</small></button>
+  <button class="navbtn" data-screen="watchScreen"><b>◉</b><small>Live</small></button>
+  <button class="navbtn" data-screen="drawScreen"><b>⚙</b><small>Admin</small></button>
+</nav>
+
+<div id="pinModal" class="overlay"><div class="scrim"></div><div class="modal"><h3>Admin Access</h3><div class="small">Enter your private draw PIN.</div><input id="pinInput" type="password" inputmode="numeric" placeholder="PIN"><div class="ctaRow"><button id="pinCancel" class="btn soft">Cancel</button><button id="pinSubmit" class="btn primary">Continue</button></div></div></div>
+<div id="winnerOverlay" class="overlay"><div class="scrim"></div><div class="winnerSplash"><div id="confetti" class="confetti"></div><div class="small" style="text-transform:uppercase;font-weight:900;color:var(--gold);letter-spacing:.14em">Official Winner</div><h2>Congratulations!</h2><div id="winnerName" class="winnerName">Guest</div><div id="winnerPrize" class="winnerMoney">₦0</div><p id="winnerMeta"></p><div class="ctaRow" style="justify-content:center"><button id="nextSpinBtn" class="btn gold">Continue</button></div></div></div>
+<div id="liveWinnerOverlay" class="overlay"><div class="scrim"></div><div class="winnerSplash"><div id="liveConfetti" class="confetti"></div><div class="small" style="text-transform:uppercase;font-weight:900;color:var(--gold);letter-spacing:.14em">Live Winner</div><h2>Congratulations!</h2><div id="liveWinnerName" class="winnerName">Guest</div><div id="liveWinnerPrize" class="winnerMoney">₦0</div><p>We will reach out to you for details of where to transfer the funds.</p><div class="ctaRow" style="justify-content:center"><button id="closeLiveWinnerBtn" class="btn gold">Back to Live Draw</button></div></div></div>
+
 <script>
-(async()=>{
-  const BROKEN='https://raw.githubusercontent.com/KingAmada/shortletreward/5039b3389f66db1b227d099db4f349a987fb6693/index.html';
-  try{
-    let source=await (await fetch(BROKEN,{cache:'no-store'})).text();
-    const broken='const oldLine="source=source.replace(marker,patch+\'\\n\'+marker);";';
-    const fixed='const oldLine="source=source.replace(marker,patch+\'\\\\n\'+marker);";';
-    if(!source.includes(broken)) throw new Error('Repair target not found');
-    source=source.replace(broken,fixed);
-    document.open('text/html','replace');
-    document.write(source);
-    document.close();
-  }catch(err){
-    console.error(err);
-    document.body.innerHTML='<div class="boot"><div><b>Unable to load Guest Rewards</b><span>Please refresh the page.</span></div></div>';
-  }
+(()=>{
+  const KEY = 'guestRewardsMobileApp_v1';
+  const SUPABASE_URL = 'https://rwvngisohnflfofikspy.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_V3B4qEnO8hPcHofizy8zoA_TDANaLlx';
+  const RAFFLE_API = SUPABASE_URL + '/functions/v1/guest-raffle-api';
+  const NEXT_DRAW_KEY = 'guestRewardsNextDrawAt_v1';
+  const NEXT_DRAW_INTERVAL = 7 * 24 * 60 * 60 * 1000;
+  const LOCATIONS = ['Hilltop Katampe','Palmwood Jahi','Bradford Gwarinpa','Whitehouse Gwarinpa'];
+  const PRIZES = ['₦50,000','₦50,000','₦50,000','₦50,000','₦100,000','₦100,000','₦100,000','₦1,000,000'];
+  const UNIT_OPTIONS = {
+    'Hilltop Katampe': ['4 Bedroom Apartment — Unit 1','4 Bedroom Apartment — Unit 2','4 Bedroom Apartment — Unit 3','1 Bedroom Apartment — Unit 1','1 Bedroom Apartment — Unit 2','1 Bedroom Apartment — Unit 3'],
+    'Palmwood Jahi': ['2 Bedroom Apartment — Unit 1','2 Bedroom Apartment — Unit 2','3 Bedroom Apartment — Unit 1','3 Bedroom Apartment — Unit 2','1 Bedroom Apartment — Unit 1','1 Bedroom Apartment — Unit 2'],
+    'Whitehouse Gwarinpa': ['1 Bedroom Apartment — Unit 1','1 Bedroom Apartment — Unit 2','1 Bedroom Apartment — Unit 3','Studio Apartment — Unit 1','Studio Apartment — Unit 2','Studio Apartment — Unit 3'],
+    'Bradford Gwarinpa': ['Studio Apartment — Unit 1','Studio Apartment — Unit 2','Studio Apartment — Unit 3','Studio Apartment — Unit 4','2 Bedroom Apartment — Unit 1']
+  };
+  const HOME_DEMO_NAMES = ['Amina Yusuf','Tunde Adeyemi','Rahila James','David Peter','Ngozi Eze','Musa Bello','Fatima Ibrahim','Emeka Nwosu','Zainab Lawal','Ibrahim Sani'];
+  const COLORS = ['#c90000','#19191d','#d18e00','#8f0000','#5d5d66','#e74949','#a66c00','#2e2e34','#bc2d2d','#7a5600','#44444b','#f06a6a'];
+  const PRELOAD_APARTMENTS = Array.from({length:25},(_,i)=>({entryId:'APARTMENT-'+(i+1),label:'Apartment '+String(i+1).padStart(2,'0'),location:'Portfolio',days:1,placeholder:true}));
+  const WEEKLY_PRIZE_PLAN={1:['₦50,000','₦50,000'],2:['₦50,000','₦50,000','₦100,000'],3:['₦100,000','₦100,000'],4:['₦1,000,000']};
+  function currentCampaignWeek(d=new Date()){const day=d.getDate();return day<=7?1:day<=14?2:day<=21?3:4;}
+  function monthBounds(d=new Date()){return {start:new Date(d.getFullYear(),d.getMonth(),1),end:new Date(d.getFullYear(),d.getMonth()+1,1)};}
+  function weekBounds(d=new Date()){const w=currentCampaignWeek(d),m=monthBounds(d),startDay=w===1?1:w===2?8:w===3?15:22;return {start:new Date(d.getFullYear(),d.getMonth(),startDay),end:w===4?m.end:new Date(d.getFullYear(),d.getMonth(),startDay+7)};}
+  function overlapDays(entry,start,end){if(!entry||!entry.checkIn||!entry.checkOut)return 0;const a=new Date(entry.checkIn+'T00:00:00'),b=new Date(entry.checkOut+'T00:00:00'),s=new Date(Math.max(a,start)),z=new Date(Math.min(b,end));return Math.max(0,Math.round((z-s)/86400000));}
+  function inPeriod(ts,start,end){if(!ts)return false;const d=new Date(ts);return d>=start&&d<end;}
+  function monthResults(){const b=monthBounds();return state.results.filter(r=>inPeriod(r.wonAt,b.start,b.end));}
+  function weekResults(){const b=weekBounds();return state.results.filter(r=>inPeriod(r.wonAt,b.start,b.end));}
+  function weeklyWinnerTarget(){return WEEKLY_PRIZE_PLAN[currentCampaignWeek()].length;}
+  function currentPrize(){const p=WEEKLY_PRIZE_PLAN[currentCampaignWeek()],n=weekResults().length;return p[n]||'Completed';}
+  function wonPhonesThisMonth(){return new Set(monthResults().map(r=>r.phone).filter(Boolean));}
+  function publicWeekResults(rows){const b=weekBounds();return (rows||[]).filter(r=>inPeriod(r.wonAt,b.start,b.end));}
+  function compactApartment(a){return String(a||'').replace(/(\d+) Bedroom Apartment — Unit (\d+)/i,'$1BR U$2').replace(/Studio Apartment — Unit (\d+)/i,'Studio U$1').replace(/Apartment — Unit /i,'Apt U');}
+  function eligibleGuestCount(){return new Set(eligibleEntries().map(e=>e.phone).filter(Boolean)).size;}
+
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)], byId = id => document.getElementById(id);
+  let state = load(), adminOpen=false, adminPin='', remoteLiveState={status:'idle',locked:false,tickets:[],winners:[],spinPlan:null,updatedAt:0};
+  let lastLiveWinnerSignature='',liveWinnerOverlayOpen=false,lastRemotePlanId='',remoteSpinRAF=0,spinning=false,wheelRotation=0,demoRotation=0,demoTimer=null,currentTickets=[],currentTicketSignature='',spinRAF=0;
+  const soundEnabled=true;let liveSoundEnabled=true;const liveChannel='BroadcastChannel' in window?new BroadcastChannel('guest-rewards-live-draw-v1'):null;
+  let audioCtx=null,engineOsc=null,engineGain=null,noiseSource=null,noiseGain=null,lastTickBoundary=0,lastTickTime=0;
+
+  function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.entries)&&Array.isArray(x.results))return x;}catch{}return {entries:[],locked:false,results:[],log:[]};}
+  function save(){localStorage.setItem(KEY,JSON.stringify(state));render();}
+  async function apiCall(action,payload={},pin=adminPin){const res=await fetch(RAFFLE_API,{method:'POST',headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY},body:JSON.stringify({action,pin,...payload})});let data={};try{data=await res.json();}catch{}if(!res.ok||data?.error)throw new Error(data?.error||('Request failed: '+res.status));return data;}
+  function rowToEntry(r){return {id:r.id,fullName:r.full_name,phone:r.phone,email:r.email||'',location:r.location,apartment:r.apartment,checkIn:r.check_in,checkOut:r.check_out,days:Number(r.stay_days)||1,status:r.status||'pending',wonAt:r.won_at||null,prize:r.prize||null,created:r.created_at};}
+  function rebuildResults(){state.results=state.entries.filter(e=>e.wonAt).sort((a,b)=>new Date(a.wonAt)-new Date(b.wonAt)).map(e=>({...e,prize:e.prize||'Prize'}));}
+  async function refreshEntriesFromServer(){if(!adminPin)return;const data=await apiCall('list_entries');state.entries=(data.entries||[]).map(rowToEntry);rebuildResults();localStorage.setItem(KEY,JSON.stringify(state));currentTicketSignature='';currentTickets=[];render();}
+  function publicWinners(){return monthResults().map(w=>({id:w.id,name:compactApartment(w.apartment)+' · '+mask(w.fullName),prize:w.prize,location:w.location,apartment:w.apartment,days:w.days,wonAt:w.wonAt}));}
+  function publicTickets(){return buildTickets().map(t=>{const e=state.entries.find(x=>x.id===t.entryId);return {entryId:t.entryId,label:t.label,publicLabel:(e?compactApartment(e.apartment)+' · '+mask(e.fullName):mask(t.label)),location:t.location,days:t.days,slot:t.slot};});}
+  async function publishLiveState(extra={}){if(!adminPin)return;const payload={status:'idle',locked:!!state.locked,tickets:publicTickets(),winners:publicWinners(),spinPlan:null,...extra};try{await apiCall('set_live',{state:payload});}catch(err){console.warn('Live sync failed',err);}}
+  async function fetchLiveState(){try{const res=await fetch(SUPABASE_URL+'/rest/v1/guest_raffle_live?id=eq.main&select=state',{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY},cache:'no-store'});if(!res.ok)return;const rows=await res.json(),live=rows?.[0]?.state;if(!live)return;remoteLiveState=live;state.locked=!!live.locked;applyRemoteLiveState(live);}catch(err){console.warn('Live read failed',err);}}
+  function setLiveOnlyTelemetry(speed,phase,phaseKey=''){const s=Math.max(0,Math.min(260,Math.round(speed)));byId('liveSpeedReadout').textContent=`${s} KM/H`;byId('livePhaseText').textContent=phase||'';byId('liveSpeedBar').style.width=(s/260*100)+'%';const active=phaseKey==='accel'||phaseKey==='cruise'||phaseKey==='brake';byId('liveDot').classList.toggle('on',active);byId('liveState').textContent=active?'Official wheel is spinning live':phase==='Winner locked'?'Winner confirmed':'Waiting for the next official spin';const stage=byId('watchWheelStage');if(stage){stage.classList.toggle('spinning',active);stage.classList.toggle('braking',phaseKey==='brake');}}
+  function animateRemoteSpin(plan){if(!plan||!plan.id||plan.id===lastRemotePlanId||(spinning&&adminOpen))return;lastRemotePlanId=plan.id;cancelAnimationFrame(remoteSpinRAF);const tickets=Array.isArray(plan.tickets)?plan.tickets:[];if(tickets.length)drawWheel(byId('watchCanvas'),tickets);const rotor=byId('watchRotor'),TA=Number(plan.TA)||10000,TC=Number(plan.TC)||5000,TD=Number(plan.TD)||15000,total=TA+TC+TD,startAngle=Number(plan.startAngle)||0,totalDelta=Number(plan.totalDelta)||0,w=totalDelta/(TA/2+TC+TD/3),dA=w*TA/2,dC=w*TC,dD=w*TD/3,startAt=Number(plan.startAt)||Date.now();startSpinSound();function frame(){const elapsed=Math.min(total,Math.max(0,Date.now()-startAt));let angle,speed,label,phase;if(elapsed<TA){const p=elapsed/TA,remain=Math.max(0,Math.ceil((TA-elapsed)/1000));angle=startAngle+dA*p*p;speed=259*p;label=speed<70?`Building momentum · ${remain}s`:speed<180?`Accelerating hard · ${remain}s`:`Approaching 259 KM/H · ${remain}s`;phase='accel';}else if(elapsed<TA+TC){const p=(elapsed-TA)/TC,remain=Math.max(0,Math.ceil((TA+TC-elapsed)/1000));angle=startAngle+dA+dC*p;speed=259;label=`Full-speed spin · ${remain}s`;phase='cruise';}else{const p=(elapsed-TA-TC)/TD,remain=Math.max(0,Math.ceil((total-elapsed)/1000));angle=startAngle+dA+dC+dD*(1-Math.pow(1-p,3));speed=260*Math.pow(1-p,2);label=p<.16?`260 KM/H — BRAKING! · ${remain}s`:p<.58?'':p<.86?`Locking onto a name · ${remain}s`:`Final ticks · ${remain}s`;phase='brake';}rotor.style.transform=`rotate(${angle}deg)`;setLiveOnlyTelemetry(speed,label,phase);updateSpinSound(speed,phase);if(elapsed<total)remoteSpinRAF=requestAnimationFrame(frame);else{stopSpinSound();setLiveOnlyTelemetry(0,'Winner locked','');pointerTick(true);}}remoteSpinRAF=requestAnimationFrame(frame);}
+  function applyRemoteLiveState(live){const realTickets=Array.isArray(live.tickets)?live.tickets:[],visualTickets=realTickets.length?realTickets:PRELOAD_APARTMENTS;if(!(spinning&&adminOpen))drawWheel(byId('watchCanvas'),visualTickets);byId('liveSlots').textContent=realTickets.length;byId('watchHubSlots').textContent=realTickets.length?`${realTickets.length} SLOT${realTickets.length===1?'':'S'}`:'25 APARTMENTS';const winners=Array.isArray(live.winners)?live.winners:[],thisWeek=publicWeekResults(winners);byId('liveProgress').textContent=`${thisWeek.length} / ${weeklyWinnerTarget()}`;byId('livePrize').textContent=WEEKLY_PRIZE_PLAN[currentCampaignWeek()][thisWeek.length]||'Completed';if(winners.length){const latest=winners[winners.length-1];byId('watchLatestWinner').textContent=`${latest.name||latest.fullName||'Guest'} won ${latest.prize}`;byId('watchWinnerList').innerHTML=winners.map((w,i)=>`<div class="publicWinner"><b>${i+1}. ${esc(w.name||w.fullName||'Guest')}</b><span>${esc(w.prize||'')}</span></div>`).join('');}else{byId('watchLatestWinner').textContent=realTickets.length?'Waiting for the official spin...':'Verify yourself to appear on the wheel';byId('watchWinnerList').innerHTML='';}if(live.status==='spinning'&&live.spinPlan){if(liveWinnerOverlayOpen){byId('liveWinnerOverlay').classList.remove('show');liveWinnerOverlayOpen=false;}animateRemoteSpin(live.spinPlan);}else if(live.status==='winner'){setLiveOnlyTelemetry(0,'Winner locked','');if(winners.length){const latest=winners[winners.length-1],signature=`${latest.id||latest.name||latest.fullName||'guest'}|${latest.prize||''}|${winners.length}`;if(signature!==lastLiveWinnerSignature){lastLiveWinnerSignature=signature;if(byId('watchScreen').classList.contains('active'))showLiveWinner(latest);}}}}
+  function uid(){return 'GUEST-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase();}
+  function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function mask(name){const first=(String(name||'').trim().split(/\s+/)[0]||'Guest');if(first.length===1)return first.toUpperCase()+'***';return first[0].toUpperCase()+'***'+first[first.length-1].toUpperCase();}
+  function nights(a,b){if(!a||!b)return 0;const d=Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);return d>0?d:0;}
+  function digits(v){return String(v||'').replace(/\D/g,'');}
+  function showScreen(id,updateHash=true){if(id==='drawScreen'&&!adminOpen){byId('pinModal').classList.add('show');byId('pinInput').value='';setTimeout(()=>byId('pinInput').focus(),50);return;}$$('.screen').forEach(x=>x.classList.toggle('active',x.id===id));$$('.navbtn').forEach(n=>n.classList.toggle('active',n.dataset.screen===id));if(updateHash){const hash={homeScreen:'#home',enterScreen:'#enter',watchScreen:'#live',drawScreen:'#admin'}[id]||'#home';if(location.hash!==hash)history.replaceState(null,'',hash);}window.scrollTo({top:0,behavior:'smooth'});}
+  $$('.navbtn').forEach(btn=>btn.addEventListener('click',()=>{if(btn.dataset.screen==='drawScreen'&&!adminOpen){byId('pinModal').classList.add('show');byId('pinInput').value='';return;}showScreen(btn.dataset.screen);}));
+  byId('goEnterBtn').onclick=()=>showScreen('enterScreen');byId('goDrawBtn').onclick=()=>showScreen('watchScreen');byId('pinCancel').onclick=()=>byId('pinModal').classList.remove('show');
+  byId('pinSubmit').onclick=async()=>{const pin=byId('pinInput').value.trim();try{await apiCall('verify_admin',{pin},'');adminPin=pin;adminOpen=true;byId('pinModal').classList.remove('show');await refreshEntriesFromServer();await fetchLiveState();showScreen('drawScreen');}catch(err){alert(err.message||'Incorrect PIN');}};byId('pinInput').addEventListener('keydown',e=>{if(e.key==='Enter')byId('pinSubmit').click();});
+  const phone=byId('phone');phone.addEventListener('input',()=>{phone.value=digits(phone.value).slice(0,11);updateProgress();});['fullName','email','location','apartment','checkIn','checkOut','consent'].forEach(id=>{byId(id).addEventListener('input',updateProgress);byId(id).addEventListener('change',updateProgress);});
+  function populateUnits(){const location=byId('location').value,apartment=byId('apartment'),options=UNIT_OPTIONS[location]||[];apartment.innerHTML=options.length?'<option value="">Select Apartment / Unit</option>'+options.map(x=>`<option>${esc(x)}</option>`).join(''):'<option value="">Select a Location First</option>';apartment.disabled=!options.length;updateProgress();}
+  function isoShift(dateString,days){if(!dateString)return '';const d=new Date(dateString+'T00:00:00');d.setDate(d.getDate()+days);return d.toISOString().slice(0,10);}
+  function syncDateLimits(source){const checkIn=byId('checkIn'),checkOut=byId('checkOut');checkOut.min=checkIn.value?isoShift(checkIn.value,1):'';checkIn.max=checkOut.value?isoShift(checkOut.value,-1):'';if(checkIn.value&&checkOut.value&&nights(checkIn.value,checkOut.value)<1){if(source==='checkIn')checkOut.value='';else checkIn.value='';}updateProgress();}
+  byId('location').addEventListener('change',populateUnits);byId('checkIn').addEventListener('change',()=>syncDateLimits('checkIn'));byId('checkOut').addEventListener('change',()=>syncDateLimits('checkOut'));
+  function updateProgress(){const req=['fullName','phone','location','apartment','checkIn','checkOut'];let done=req.filter(id=>String(byId(id).value||'').trim()).length+(byId('consent').checked?1:0),pct=Math.round(done/7*100);byId('progressBar').style.width=Math.max(0,pct)+'%';byId('progressText').textContent=Math.max(0,pct)+'% complete';const n=nights(byId('checkIn').value,byId('checkOut').value);byId('slotCount').textContent=(n||1)+' '+((n||1)===1?'Slot':'Slots');byId('slotExplain').textContent=n?`${n} verified stay day${n===1?'':'s'} recorded. Weekly wheel slots are calculated from the stay-days that fall inside each campaign week.`:'Enter your stay dates to calculate your wheel slots.';}
+  byId('entryForm').addEventListener('submit',async e=>{e.preventDefault();if(state.locked){alert('Entries are locked for the draw.');return;}const fullName=byId('fullName').value.trim(),phoneVal=digits(byId('phone').value).slice(0,11),email=byId('email').value.trim(),location=byId('location').value,apartment=byId('apartment').value.trim(),checkIn=byId('checkIn').value,checkOut=byId('checkOut').value,consent=byId('consent').checked,stayDays=nights(checkIn,checkOut);if(!fullName||!location||!apartment||!consent){alert('Please complete all required fields correctly.');return;}if(stayDays<1){alert('Check-out date must be after the check-in date.');return;}if(!/^0\d{10}$/.test(phoneVal)){alert('Phone number must be 11 digits in Nigerian format, for example 08012345678.');return;}try{const data=await apiCall('submit_entry',{fullName,phone:phoneVal,email,location,apartment,checkIn,checkOut,days:stayDays},''),entry=rowToEntry(data.entry);state.entries=state.entries.filter(x=>x.id!==entry.id);state.entries.unshift(entry);save();byId('entryForm').reset();populateUnits();byId('checkIn').max='';byId('checkOut').min='';updateProgress();byId('entryCode').textContent=entry.id;byId('successCard').classList.add('show');showScreen('enterScreen');}catch(err){alert(err.message||'Unable to submit your verification right now.');}});
+  function randomInt(max){if(max<=0)return 0;if(window.crypto&&crypto.getRandomValues){const limit=Math.floor(0x100000000/max)*max,x=new Uint32Array(1);do{crypto.getRandomValues(x);}while(x[0]>=limit);return x[0]%max;}return Math.floor(Math.random()*max);}
+  function cryptoShuffle(items){const a=[...items];for(let i=a.length-1;i>0;i--){const j=randomInt(i+1),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+  function spreadTicketGroups(entries){let groups=cryptoShuffle(entries.map(x=>{const n=Math.max(1,Number(x.days)||1);return {entry:x,weight:n,remaining:n,current:randomInt(1000000)/1000000};})),tickets=[],lastId='';while(groups.some(g=>g.remaining>0)){const active=groups.filter(g=>g.remaining>0),totalWeight=active.reduce((sum,g)=>sum+g.weight,0);active.forEach(g=>g.current+=g.weight);let candidates=active.filter(g=>g.entry.id!==lastId);if(!candidates.length)candidates=active;const max=Math.max(...candidates.map(g=>g.current)),top=candidates.filter(g=>Math.abs(g.current-max)<1e-9),chosen=top[randomInt(top.length)];chosen.current-=totalWeight;const placed=chosen.weight-chosen.remaining+1,x=chosen.entry;tickets.push({entryId:x.id,label:x.fullName,location:x.location,slot:placed,total:chosen.weight,days:x.days});chosen.remaining--;lastId=x.id;}if(tickets.length>3&&tickets[0].entryId===tickets[tickets.length-1].entryId){const candidates=[];for(let i=1;i<tickets.length-1;i++){const repl=tickets[tickets.length-1];if(tickets[i].entryId!==tickets[0].entryId&&tickets[i-1].entryId!==repl.entryId&&tickets[i+1].entryId!==repl.entryId)candidates.push(i);}if(candidates.length){const i=candidates[randomInt(candidates.length)],tmp=tickets[i];tickets[i]=tickets[tickets.length-1];tickets[tickets.length-1]=tmp;}}if(tickets.length>1){const off=randomInt(tickets.length);tickets=tickets.slice(off).concat(tickets.slice(0,off));}return tickets;}
+  function eligibleEntries(){const wonPhones=wonPhonesThisMonth(),week=currentCampaignWeek(),period=week===4?monthBounds():weekBounds(),verified=state.entries.filter(x=>x.status==='verified'&&!wonPhones.has(x.phone));let qualifyingPhones=null;if(week===4){const totals=new Map();verified.forEach(x=>totals.set(x.phone,(totals.get(x.phone)||0)+overlapDays(x,period.start,period.end)));qualifyingPhones=new Set([...totals].filter(([,days])=>days>=7).map(([phone])=>phone));}return verified.filter(x=>!qualifyingPhones||qualifyingPhones.has(x.phone)).map(x=>({...x,days:overlapDays(x,period.start,period.end)})).filter(x=>x.days>0);}
+  function buildTickets(force=false){const eligible=eligibleEntries(),signature=eligible.map(x=>`${x.id}:${Math.max(1,Number(x.days)||1)}`).sort().join('|');if(!force&&signature===currentTicketSignature&&currentTickets.length)return currentTickets;currentTicketSignature=signature;currentTickets=spreadTicketGroups(eligible);return currentTickets;}
+  function guestColor(id){let h=0;for(let i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0;return COLORS[h%COLORS.length];}
+  function shortLabel(name){const first=String(name).trim().split(/\s+/)[0]||'Guest';return first.length>10?first.slice(0,10):first;}
+  function drawWheel(canvas,tickets){const ctx=canvas.getContext('2d'),dpr=Math.min(window.devicePixelRatio||1,2),css=canvas.getBoundingClientRect().width||360,size=Math.max(620,Math.round(css*dpr));if(canvas.width!==size||canvas.height!==size){canvas.width=size;canvas.height=size;}ctx.clearRect(0,0,size,size);const cx=size/2,cy=size/2,r=size*.49;if(!tickets.length){ctx.beginPath();ctx.fillStyle='#fff';ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();ctx.fillStyle='#666';ctx.textAlign='center';ctx.font=`800 ${size*.045}px Arial`;ctx.fillText('No Wheel Slots Yet',cx,cy-5);ctx.font=`500 ${size*.027}px Arial`;ctx.fillText('Verify entries to build the wheel',cx,cy+30);return;}const arc=Math.PI*2/tickets.length;ctx.save();ctx.translate(cx,cy);tickets.forEach((t,i)=>{const a0=-Math.PI/2+i*arc,a1=a0+arc;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,a0,a1);ctx.closePath();ctx.fillStyle=guestColor(t.entryId);ctx.fill();ctx.strokeStyle='rgba(255,255,255,.62)';ctx.lineWidth=tickets.length>250?.35:1;ctx.stroke();const deg=360/tickets.length;if(deg>=3.2||i%Math.ceil(3.2/Math.max(deg,.01))===0){ctx.save();ctx.rotate(a0+arc/2);ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.shadowColor='rgba(0,0,0,.82)';ctx.shadowBlur=4;ctx.font=`900 ${Math.max(10,Math.min(23,size*.032))}px Arial`;let label=t.publicLabel||mask(t.label);if(label.length>20)label=label.slice(0,19)+'…';ctx.fillText(label,r-18,0);ctx.restore();}});ctx.beginPath();ctx.arc(0,0,r*.22,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();ctx.restore();}
+  function renderEntries(){const list=byId('entryList');if(!state.entries.length){list.innerHTML='<div class="entryCard emptyState"><div class="entryEmptyIcon">🗂</div><div><b>No guest entries yet</b><div class="small">Verified guests will appear here in beautiful cards.</div></div></div>';return;}const wonPhones=wonPhonesThisMonth(),eligibleIds=new Set(eligibleEntries().map(e=>e.id));list.innerHTML=state.entries.map(entry=>{const hasWon=wonPhones.has(entry.phone),eligibleNow=eligibleIds.has(entry.id),badgeClass=hasWon?'winnerTag':entry.status,badgeText=hasWon?'Winner · Removed':entry.status==='verified'?(eligibleNow?'Eligible This Week':'Verified · Not This Week'):'Pending';let note='Awaiting verification before entering the wheel.';if(hasWon)note='This guest has already won this month, so all of their remaining slots are disabled.';else if(entry.status==='verified'&&eligibleNow)note=`Eligible for Week ${currentCampaignWeek()} using stay-days inside this campaign period.`;else if(entry.status==='verified'&&currentCampaignWeek()===4)note='Verified, but the ₦1M Grand Prize requires at least 7 verified stay-days during the month.';else if(entry.status==='verified')note='Verified, but this booking has no stay-days inside the current campaign week.';return `<div class="entryCard ${hasWon?'winnerDisabled':''}"><div class="entryTop"><div class="entryIdentity"><b>${esc(entry.fullName)}</b><small>${entry.phone}</small></div><span class="tag ${badgeClass}">${badgeText}</span></div><div class="entryChips"><span class="entryChip">📍 ${esc(entry.location)}</span><span class="entryChip">🏠 ${esc(entry.apartment)}</span><span class="entryChip hot">🌙 ${entry.days} Stay Day${entry.days===1?'':'s'}</span></div><div class="entryNote ${hasWon?'winnerNote':''}">${note}</div><div class="entryActions"><button class="btn entryAction toggleBtn" data-id="${esc(entry.id)}" ${(state.locked||spinning||hasWon)?'disabled':''}>${entry.status==='verified'?'Unverify':'Verify Entry'}</button></div></div>`;}).join('');$$('.toggleBtn').forEach(btn=>btn.onclick=async()=>{const x=state.entries.find(e=>e.id===btn.dataset.id);if(!x||state.locked||spinning)return;try{await apiCall('set_status',{id:x.id,status:x.status==='verified'?'pending':'verified'});await refreshEntriesFromServer();await publishLiveState();}catch(err){alert(err.message||'Unable to update guest.');}});}
+  function renderResults(){const resultList=byId('resultList'),rows=monthResults();if(!rows.length){resultList.innerHTML='';return;}resultList.innerHTML=rows.map((w,i)=>`<div class="winner"><div class="winnerPos">${i+1}</div><div><b>${esc(compactApartment(w.apartment)+' · '+mask(w.fullName))}</b><br><span class="small">${esc(w.location)} · ${w.days} stay day${w.days===1?'':'s'}</span></div><div class="winnerPrize">${esc(w.prize)}</div></div>`).join('');}
+  function render(){const verified=state.entries.filter(x=>x.status==='verified').length,tickets=buildTickets(),weekRows=weekResults();byId('entryCount').textContent=state.entries.length;byId('entryCollapseMeta').textContent=`${state.entries.length} booking${state.entries.length===1?'':'s'} · ${eligibleGuestCount()} eligible this week`;byId('verifiedCount').textContent=verified;byId('wheelSlots').textContent=tickets.length;byId('hubSlots').textContent=`${tickets.length} SLOT${tickets.length===1?'':'S'}`;byId('drawBadge').textContent=weekRows.length>=weeklyWinnerTarget()?`Week ${currentCampaignWeek()} Completed`:state.locked?'Entries Locked':`Week ${currentCampaignWeek()} Entries Open`;byId('drawBadge').className='tag '+(state.locked||weekRows.length>=weeklyWinnerTarget()?'pending':'verified');byId('nextPrize').textContent=currentPrize();byId('spinProgress').textContent=`${weekRows.length} / ${weeklyWinnerTarget()}`;byId('ticketStream').innerHTML=tickets.length?tickets.map((t,i)=>`<b>${i+1}.</b> ${esc(shortLabel(t.label))}`).join(' • '):'No eligible wheel slots for the current campaign week';drawWheel(byId('mainCanvas'),tickets);const publicRealTickets=Array.isArray(remoteLiveState.tickets)?remoteLiveState.tickets:tickets,publicVisualTickets=publicRealTickets.length?publicRealTickets:PRELOAD_APARTMENTS;if(!(spinning&&adminOpen))drawWheel(byId('watchCanvas'),publicVisualTickets);const publicWinnerRows=Array.isArray(remoteLiveState.winners)&&remoteLiveState.winners.length?remoteLiveState.winners:publicWinners(),publicCurrentWeek=publicWeekResults(publicWinnerRows);byId('livePrize').textContent=WEEKLY_PRIZE_PLAN[currentCampaignWeek()][publicCurrentWeek.length]||'Completed';byId('liveProgress').textContent=`${publicCurrentWeek.length} / ${weeklyWinnerTarget()}`;byId('liveSlots').textContent=publicRealTickets.length;byId('watchHubSlots').textContent=publicRealTickets.length?`${publicRealTickets.length} slot${publicRealTickets.length===1?'':'s'}`:'25 apartments';if(publicWinnerRows.length){const latest=publicWinnerRows[publicWinnerRows.length-1];byId('watchLatestWinner').textContent=`${latest.name||mask(latest.fullName||'Guest')} won ${latest.prize}`;byId('watchWinnerList').innerHTML=publicWinnerRows.map((w,i)=>`<div class="publicWinner"><b>${i+1}. ${esc(w.name||mask(w.fullName||'Guest'))}</b><span>${esc(w.prize||'')}</span></div>`).join('');}else{byId('watchLatestWinner').textContent=publicRealTickets.length?'Waiting for the official spin...':'Verify yourself to appear on the wheel';byId('watchWinnerList').innerHTML='';}const aw=byId('activeWeekPill');if(aw)aw.textContent=currentCampaignWeek()===4?'Week 4 · ₦1,000,000 Grand Finale':`Week ${currentCampaignWeek()} · Next Reward ${currentPrize()}`;renderEntries();renderResults();byId('verifyAllBtn').disabled=state.locked||spinning;byId('lockBtn').disabled=spinning;byId('prepareBtn').disabled=eligibleGuestCount()<Math.max(1,weeklyWinnerTarget()-weekRows.length)||weekRows.length>=weeklyWinnerTarget()||spinning;byId('spinBtn').disabled=true;}
+  byId('entryCollapseBtn').onclick=()=>{const wrap=byId('entryListWrap'),btn=byId('entryCollapseBtn'),open=wrap.classList.toggle('open');btn.setAttribute('aria-expanded',String(open));};
+  byId('verifyAllBtn').onclick=async()=>{if(state.locked||spinning)return;try{const d=await apiCall('verify_all');state.entries=(d.entries||[]).map(rowToEntry);rebuildResults();save();await publishLiveState();}catch(err){alert(err.message||'Unable to verify entries.');}};
+  byId('lockBtn').onclick=async()=>{if(spinning)return;state.locked=!state.locked;save();await publishLiveState();};
+  byId('clearBtn').onclick=async()=>{if(prompt('Type CLEAR ALL')!=='CLEAR ALL')return;try{await apiCall('clear_all');state={entries:[],locked:false,results:[],log:[]};remoteLiveState={status:'idle',locked:false,tickets:[],winners:[],spinPlan:null};localStorage.removeItem(KEY);save();wheelRotation=0;byId('mainRotor').style.transform='rotate(0deg)';byId('watchRotor').style.transform='rotate(0deg)';}catch(err){alert(err.message||'Unable to clear data.');}};
+  byId('openLiveBtn').onclick=()=>window.open(location.href.split('#')[0]+'#live','_blank','noopener');
+  byId('exportBtn').onclick=()=>{const rows=[['ID','Full Name','Phone','Email','Location','Apartment','Check-In','Check-Out','Stay Days','Status'],...state.entries.map(e=>[e.id,e.fullName,e.phone,e.email,e.location,e.apartment,e.checkIn,e.checkOut,e.days,e.status])],csv=rows.map(r=>r.map(x=>`"${String(x??'').replace(/"/g,'""')}"`).join(',')).join('\n'),blob=new Blob([csv],{type:'text/csv'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='guest-rewards-entries.csv';a.click();URL.revokeObjectURL(url);};
+  byId('demoBtn').onclick=async()=>{if(state.locked||spinning)return;try{const d=await apiCall('add_demo');state.entries=(d.entries||[]).map(rowToEntry);rebuildResults();save();await publishLiveState();}catch(err){alert(err.message||'Unable to add demo entries.');}};
+  byId('prepareBtn').onclick=()=>{const need=weeklyWinnerTarget()-weekResults().length;if(need<=0)return alert('This week’s rewards have already been completed.');if(eligibleGuestCount()<need)return alert(`At least ${need} unique eligible guest${need===1?'':'s'} are required for the remaining reward${need===1?'':'s'} this week.`);state.locked=true;save();publishLiveState();byId('confirmBox').classList.add('show');byId('confirmInput').value='';byId('confirmInput').focus();};
+  byId('confirmInput').addEventListener('input',()=>{byId('spinBtn').disabled=byId('confirmInput').value.trim().toUpperCase()!=='SPIN NOW'||spinning;});
+  function ensureAudio(){if(!soundEnabled)return null;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;if(!audioCtx)audioCtx=new AC();if(audioCtx.state==='suspended')audioCtx.resume();return audioCtx;}
+  function makeNoiseBuffer(ctx,seconds=1.2){const len=Math.max(1,Math.floor(ctx.sampleRate*seconds)),b=ctx.createBuffer(1,len,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;return b;}
+  function startSpinSound(){const ctx=ensureAudio();if(!ctx)return;stopSpinSound(true);engineOsc=ctx.createOscillator();engineOsc.type='sawtooth';engineGain=ctx.createGain();const filter=ctx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=420;engineGain.gain.value=.0001;engineOsc.connect(filter).connect(engineGain).connect(ctx.destination);engineOsc.frequency.value=38;engineOsc.start();noiseSource=ctx.createBufferSource();noiseSource.buffer=makeNoiseBuffer(ctx);noiseSource.loop=true;const nf=ctx.createBiquadFilter();nf.type='bandpass';nf.frequency.value=240;nf.Q.value=.7;noiseGain=ctx.createGain();noiseGain.gain.value=.0001;noiseSource.connect(nf).connect(noiseGain).connect(ctx.destination);noiseSource._filter=nf;noiseSource.start();}
+  function updateSpinSound(speed,phase){if(!audioCtx||!soundEnabled)return;const now=audioCtx.currentTime,ratio=Math.max(0,Math.min(1,speed/260));if(engineOsc){engineOsc.frequency.setTargetAtTime(36+ratio*128,now,.035);engineGain.gain.setTargetAtTime(.012+ratio*.045,now,.04);}if(noiseSource&&noiseGain){noiseSource._filter.frequency.setTargetAtTime(170+ratio*1500,now,.04);noiseGain.gain.setTargetAtTime(.006+ratio*.034,now,.05);}if(phase==='brake'&&engineOsc)engineOsc.detune.setTargetAtTime(-220*(1-ratio),now,.05);}
+  function stopSpinSound(immediate=false){if(!audioCtx)return;const now=audioCtx.currentTime,fade=immediate?.01:.3;[engineGain,noiseGain].forEach(g=>{if(g){try{g.gain.cancelScheduledValues(now);g.gain.setValueAtTime(Math.max(.0001,g.gain.value),now);g.gain.exponentialRampToValueAtTime(.0001,now+fade);}catch{}}});[engineOsc,noiseSource].forEach(x=>{if(x){try{x.stop(now+fade+.04);}catch{}}});engineOsc=engineGain=noiseSource=noiseGain=null;}
+  function playTick(power=1){const ctx=ensureAudio();if(!ctx)return;const now=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();o.type='square';o.frequency.setValueAtTime(920+power*520,now);o.frequency.exponentialRampToValueAtTime(330,now+.035);g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.018+power*.018,now+.003);g.gain.exponentialRampToValueAtTime(.0001,now+.052);o.connect(g).connect(ctx.destination);o.start(now);o.stop(now+.06);}
+  function playFanfare(){const ctx=ensureAudio();if(!ctx)return;const now=ctx.currentTime;[[523.25,0],[659.25,.09],[783.99,.18],[1046.5,.34]].forEach(([freq,delay],i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=i===3?'triangle':'sine';o.frequency.value=freq;g.gain.setValueAtTime(.0001,now+delay);g.gain.exponentialRampToValueAtTime(i===3?.17:.11,now+delay+.025);g.gain.exponentialRampToValueAtTime(.0001,now+delay+.75);o.connect(g).connect(ctx.destination);o.start(now+delay);o.stop(now+delay+.8);});}
+  function pointerTick(final=false){['wheelStage','watchWheelStage'].forEach(id=>{const stage=byId(id);if(!stage)return;const p=stage.querySelector('.pointer');p.classList.remove('tick','finalTick');void p.offsetWidth;p.classList.add(final?'finalTick':'tick');setTimeout(()=>p.classList.remove(final?'finalTick':'tick'),final?600:120);});}
+  function getNextDrawAt(){let target=Number(localStorage.getItem(NEXT_DRAW_KEY)||0),now=Date.now();if(!target||target<=now){target=now+NEXT_DRAW_INTERVAL;localStorage.setItem(NEXT_DRAW_KEY,String(target));}return target;}
+  function formatCountdown(ms){const total=Math.max(0,Math.floor(ms/1000)),days=Math.floor(total/86400),hours=Math.floor((total%86400)/3600),mins=Math.floor((total%3600)/60),secs=total%60,hh=String(hours+days*24).padStart(2,'0');return `${hh}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;}
+  function updateNextDrawCountdown(){const el=byId('nextDrawCountdown'),label=byId('nextDrawLabel');if(!el||!label)return;if(spinning){label.textContent='Draw Live Now';el.textContent='SPINNING';return;}let target=getNextDrawAt(),remaining=target-Date.now();if(remaining<=0){target=Date.now()+NEXT_DRAW_INTERVAL;localStorage.setItem(NEXT_DRAW_KEY,String(target));remaining=NEXT_DRAW_INTERVAL;}label.textContent='Next Draw In';el.textContent=formatCountdown(remaining);}setInterval(updateNextDrawCountdown,1000);
+  function setTelemetry(speed,phase,phaseKey=''){const s=Math.max(0,Math.min(260,Math.round(speed)));byId('speedReadout').textContent=`${s} KM/H`;byId('phaseText').textContent=phase;byId('speedBar').style.width=(s/260*100)+'%';byId('liveSpeedReadout').textContent=`${s} KM/H`;byId('livePhaseText').textContent=phase;byId('liveSpeedBar').style.width=(s/260*100)+'%';const active=phaseKey==='accel'||phaseKey==='cruise'||phaseKey==='brake';byId('liveDot').classList.toggle('on',active);byId('liveState').textContent=active?'Official wheel is spinning live':phase==='Winner locked'?'Winner confirmed':'Waiting for the next official spin';updateNextDrawCountdown();['wheelStage','watchWheelStage'].forEach(id=>{const el=byId(id);if(el){el.classList.toggle('spinning',active);el.classList.toggle('braking',phaseKey==='brake');}});}
+  async function spinForWinner(){if(spinning||weekResults().length>=weeklyWinnerTarget())return;const tickets=buildTickets();if(!tickets.length)return alert('There are no eligible wheel slots for this week.');const need=weeklyWinnerTarget()-weekResults().length;if(eligibleGuestCount()<need)return alert('Not enough unique eligible guests remain for this week.');spinning=true;byId('spinBtn').disabled=true;byId('prepareBtn').disabled=true;byId('confirmBox').classList.remove('show');const winnerIndex=randomInt(tickets.length),selected=tickets[winnerIndex],slice=360/tickets.length,target=((-(winnerIndex+.5)*slice)%360+360)%360,current=((wheelRotation%360)+360)%360,turns=28+randomInt(8),totalDelta=(target-current+360)%360+turns*360,startAngle=wheelRotation,TA=10000,TC=5000,TD=15000,total=TA+TC+TD,w=totalDelta/(TA/2+TC+TD/3),dA=w*TA/2,dC=w*TC,dD=w*TD/3,rotor=byId('mainRotor'),publicRotor=byId('watchRotor');lastTickBoundary=Math.floor(startAngle/slice);lastTickTime=0;const spinPlan={id:'SPIN-'+Date.now()+'-'+randomInt(99999),startAt:Date.now()+1500,startAngle,totalDelta,TA,TC,TD,tickets:publicTickets(),prize:currentPrize()};remoteLiveState={status:'spinning',locked:true,tickets:spinPlan.tickets,winners:publicWinners(),spinPlan};await publishLiveState(remoteLiveState);const wait=Math.max(0,spinPlan.startAt-Date.now());if(wait)await new Promise(r=>setTimeout(r,wait));startSpinSound();setTelemetry(0,'','accel');if(liveChannel)liveChannel.postMessage({type:'spin-start',tickets:spinPlan.tickets,prize:currentPrize(),rotation:startAngle,startAt:spinPlan.startAt});function frame(){const now=Date.now(),elapsed=Math.min(total,Math.max(0,now-spinPlan.startAt));let angle,speed,label,phase;if(elapsed<TA){const p=elapsed/TA,remain=Math.max(0,Math.ceil((TA-elapsed)/1000));angle=startAngle+dA*p*p;speed=259*p;label=speed<70?`Building momentum · ${remain}s`:speed<180?`Accelerating hard · ${remain}s`:`Approaching 259 KM/H · ${remain}s`;phase='accel';}else if(elapsed<TA+TC){const p=(elapsed-TA)/TC,remain=Math.max(0,Math.ceil((TA+TC-elapsed)/1000));angle=startAngle+dA+dC*p;speed=259;label=`Full-speed spin · ${remain}s`;phase='cruise';}else{const p=(elapsed-TA-TC)/TD,remain=Math.max(0,Math.ceil((total-elapsed)/1000));angle=startAngle+dA+dC+dD*(1-Math.pow(1-p,3));speed=260*Math.pow(1-p,2);label=p<.16?`260 KM/H — BRAKING! · ${remain}s`:p<.58?'':p<.86?`Locking onto a name · ${remain}s`:`Final ticks · ${remain}s`;phase='brake';}wheelRotation=angle;rotor.style.transform=`rotate(${angle}deg)`;publicRotor.style.transform=`rotate(${angle}deg)`;setTelemetry(speed,label,phase);updateSpinSound(speed,phase);if(liveChannel)liveChannel.postMessage({type:'spin-frame',angle,speed,label,phase});const boundary=Math.floor(angle/slice),minGap=speed>210?24:speed>100?38:60;if(boundary!==lastTickBoundary&&now-lastTickTime>minGap){lastTickBoundary=boundary;lastTickTime=now;pointerTick(false);playTick(Math.max(.18,1-speed/360));}if(elapsed<total)spinRAF=requestAnimationFrame(frame);else completeSpin();}async function completeSpin(){wheelRotation=startAngle+totalDelta;rotor.style.transform=`rotate(${wheelRotation}deg)`;publicRotor.style.transform=`rotate(${wheelRotation}deg)`;stopSpinSound();setTelemetry(0,'Winner locked','');pointerTick(true);playTick(1.5);await new Promise(r=>setTimeout(r,700));const winner=state.entries.find(e=>e.id===selected.entryId),prize=currentPrize()||'Prize';try{await apiCall('mark_winner',{id:winner.id,prize});}catch(err){console.warn('Winner sync failed',err);}winner.wonAt=new Date().toISOString();winner.prize=prize;state.results.push({...winner,prize,wonAt:winner.wonAt});state.log.push({time:new Date().toISOString(),prize,winnerId:winner.id,slot:winnerIndex+1,pool:tickets.length,week:currentCampaignWeek()});localStorage.setItem(KEY,JSON.stringify(state));currentTicketSignature='';currentTickets=[];const remainingTickets=publicTickets();remoteLiveState={status:'winner',locked:true,tickets:remainingTickets,winners:publicWinners(),spinPlan:null};await publishLiveState(remoteLiveState);byId('watchLatestWinner').textContent=`${compactApartment(winner.apartment)} · ${mask(winner.fullName)} won ${prize}`;byId('watchWinnerList').innerHTML=publicWinners().map((w,i)=>`<div class="publicWinner"><b>${i+1}. ${esc(w.name)}</b><span>${esc(w.prize)}</span></div>`).join('');if(liveChannel)liveChannel.postMessage({type:'winner',winner:{name:compactApartment(winner.apartment)+' · '+mask(winner.fullName),apartment:winner.apartment,prize},state});byId('confirmInput').value='';showWinner(winner,prize,winnerIndex,tickets.length);}spinRAF=requestAnimationFrame(frame);}byId('spinBtn').onclick=spinForWinner;
+  function showLiveWinner(winner){const base=winner.name||mask(winner.fullName||'Guest'),name=base.includes('·')?base:((winner.apartment?compactApartment(winner.apartment)+' · ':'')+base);byId('liveWinnerName').textContent=name;byId('liveWinnerPrize').textContent=winner.prize||'Prize';byId('liveWinnerOverlay').classList.add('show');liveWinnerOverlayOpen=true;burstConfettiInto(byId('liveConfetti'),90);playFanfare();}
+  function burstConfettiInto(box,count=90){if(!box)return;box.innerHTML='';const colors=['#c90000','#f0bc33','#111114','#ffffff','#ff7b7b'];for(let i=0;i<count;i++){const p=document.createElement('i');p.style.left=(Math.random()*100)+'%';p.style.background=colors[i%colors.length];p.style.transform=`translateY(-20px) rotate(${Math.random()*60}deg)`;p.style.animationDelay=(Math.random()*.3)+'s';p.style.animationDuration=(1.8+Math.random()*1.4)+'s';box.appendChild(p);}}
+  byId('closeLiveWinnerBtn').onclick=()=>{byId('liveWinnerOverlay').classList.remove('show');liveWinnerOverlayOpen=false;};
+  function showWinner(winner,prize){byId('winnerName').textContent=compactApartment(winner.apartment)+' · '+mask(winner.fullName);byId('winnerPrize').textContent=prize;byId('winnerMeta').textContent='We will reach out to you for details of where to transfer the funds.';byId('winnerOverlay').classList.add('show');burstConfettiInto(byId('confetti'),110);playFanfare();}
+  byId('nextSpinBtn').onclick=async()=>{byId('winnerOverlay').classList.remove('show');spinning=false;currentTicketSignature='';currentTickets=[];wheelRotation=0;cancelAnimationFrame(spinRAF);byId('mainRotor').style.transform='rotate(0deg)';byId('watchRotor').style.transform='rotate(0deg)';setTelemetry(0,'','');const weekDone=weekResults().length>=weeklyWinnerTarget();if(weekDone){state.locked=false;save();await publishLiveState({status:'idle',locked:false,spinPlan:null});render();}else{save();render();byId('confirmBox').classList.add('show');setTimeout(()=>byId('confirmInput').focus(),100);}};
+  function startHomeDemo(){const demoTickets=HOME_DEMO_NAMES.map((name,i)=>({entryId:'HOME-'+i,label:name,location:LOCATIONS[i%LOCATIONS.length],days:1}));drawWheel(byId('homeCanvas'),demoTickets);const rotor=byId('homeRotor'),stage=byId('homeWheelStage');function spin(){const index=randomInt(demoTickets.length),slice=360/demoTickets.length,target=((-(index+.5)*slice)%360+360)%360,current=((demoRotation%360)+360)%360;demoRotation+=((target-current+360)%360)+(8+randomInt(4))*360;stage.classList.add('spinning');byId('homeDemoWinner').textContent='Spinning...';rotor.style.transform=`rotate(${demoRotation}deg)`;setTimeout(()=>{stage.classList.remove('spinning');const p=stage.querySelector('.pointer');p.classList.remove('finalTick');void p.offsetWidth;p.classList.add('finalTick');setTimeout(()=>p.classList.remove('finalTick'),600);byId('homeDemoWinner').textContent=`${mask(demoTickets[index].label)} wins a guest reward`;},4200);}spin();demoTimer=setInterval(spin,7600);}
+  if(liveChannel){liveChannel.onmessage=event=>{const m=event.data||{};if(m.type==='spin-start'){drawWheel(byId('watchCanvas'),m.tickets||[]);byId('livePrize').textContent=m.prize||'';byId('liveDot').classList.add('on');startSpinSound();}else if(m.type==='spin-frame'){byId('watchRotor').style.transform=`rotate(${m.angle||0}deg)`;setTelemetry(m.speed||0,m.label||'Live spin',m.phase||'');updateSpinSound(m.speed||0,m.phase||'');}else if(m.type==='winner'){stopSpinSound();state=m.state||state;localStorage.setItem(KEY,JSON.stringify(state));currentTicketSignature='';currentTickets=[];render();pointerTick(true);playFanfare();if(m.winner&&byId('watchScreen').classList.contains('active'))showLiveWinner(m.winner);}};}
+  window.addEventListener('storage',e=>{if(e.key===KEY){state=load();currentTicketSignature='';currentTickets=[];render();}});
+  async function startSupabaseRealtime(){try{const mod=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'),client=mod.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false},realtime:{params:{eventsPerSecond:30}}}),channel=client.channel('guest-raffle-live-v16').on('postgres_changes',{event:'*',schema:'public',table:'guest_raffle_live',filter:'id=eq.main'},payload=>{const live=payload.new&&payload.new.state;if(!live)return;remoteLiveState=live;state.locked=!!live.locked;applyRemoteLiveState(live);}).subscribe(status=>{if(status==='SUBSCRIBED'){console.info('[Guest Rewards] Supabase Realtime connected');fetchLiveState();}});window.addEventListener('beforeunload',()=>{try{client.removeChannel(channel);}catch{}});}catch(err){console.warn('Supabase Realtime unavailable; polling fallback remains active',err);}}
+  function routeFromHash(){const id={'#enter':'enterScreen','#live':'watchScreen','#admin':'drawScreen','#home':'homeScreen'}[location.hash]||'homeScreen';showScreen(id,false);}window.addEventListener('hashchange',routeFromHash);
+  document.addEventListener('pointerdown',()=>{try{ensureAudio();}catch{}},{once:true});setInterval(fetchLiveState,2500);setInterval(()=>{if(adminOpen&&!spinning)refreshEntriesFromServer().catch(()=>{});},3000);populateUnits();updateProgress();render();startHomeDemo();fetchLiveState();startSupabaseRealtime();routeFromHash();
 })();
 </script>
 </body>
