@@ -1,0 +1,69 @@
+name: Rolling month-to-date eligibility
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rolling-month-to-date.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch rolling month-to-date logic
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('index.html')
+          text = p.read_text()
+
+          old = "function eligibleEntries(){const wonPhones=wonPhonesThisMonth(),week=currentCampaignWeek(),period=week===4?monthBounds():weekBounds(),verified=state.entries.filter(x=>x.status==='verified'&&!wonPhones.has(x.phone));let qualifyingPhones=null;if(week===4){const totals=new Map();verified.forEach(x=>totals.set(x.phone,(totals.get(x.phone)||0)+overlapDays(x,period.start,period.end)));qualifyingPhones=new Set([...totals].filter(([,days])=>days>=7).map(([phone])=>phone));}return verified.filter(x=>!qualifyingPhones||qualifyingPhones.has(x.phone)).map(x=>({...x,days:overlapDays(x,period.start,period.end)})).filter(x=>x.days>0);}"
+
+          new = "function eligibleEntries(){const wonPhones=wonPhonesThisMonth(),week=currentCampaignWeek(),month=monthBounds(),today=new Date(),cutoff=new Date(Math.min(today.getTime(),month.end.getTime())),verified=state.entries.filter(x=>x.status==='verified'&&!wonPhones.has(x.phone));const monthlyDaysByPhone=new Map();verified.forEach(x=>monthlyDaysByPhone.set(x.phone,(monthlyDaysByPhone.get(x.phone)||0)+overlapDays(x,month.start,cutoff)));let qualifyingPhones=null;if(week===4){qualifyingPhones=new Set([...monthlyDaysByPhone].filter(([,days])=>days>=7).map(([phone])=>phone));}return verified.filter(x=>!qualifyingPhones||qualifyingPhones.has(x.phone)).map(x=>({...x,days:overlapDays(x,month.start,cutoff)})).filter(x=>x.days>0);}"
+
+          if old not in text:
+              raise SystemExit('eligibleEntries target not found')
+          text = text.replace(old, new)
+
+          text = text.replace(
+              'Each verified stay-day gives you one wheel slot for that week. Once you win, you are removed from every remaining draw that month. The ₦1,000,000 Grand Prize is for guests with at least 7 verified stay-days during the month.',
+              'Every verified stay-day from the beginning of the month keeps counting in each weekly draw. Once you win, you are removed from every remaining draw that month. The ₦1,000,000 Grand Prize is for guests with at least 7 verified stay-days during the month.'
+          )
+
+          text = text.replace(
+              'Weekly wheel slots are calculated from the stay-days that fall inside each campaign week.',
+              'Your wheel slots accumulate from all verified stay-days completed so far this month.'
+          )
+
+          text = text.replace(
+              "note=`Eligible for Week ${currentCampaignWeek()} using stay-days inside this campaign period.`;",
+              "note=`Eligible for Week ${currentCampaignWeek()} using your accumulated verified stay-days this month.`;"
+          )
+
+          text = text.replace(
+              "note='Verified, but this booking has no stay-days inside the current campaign week.';",
+              "note='Verified, but this booking has no completed stay-days in the current month yet.';"
+          )
+
+          p.write_text(text)
+          PY
+
+      - name: Commit patch
+        shell: bash
+        run: |
+          git config user.name "OpenAI GitHub App"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git commit -m "Use rolling month-to-date guest eligibility"
+          git push
