@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/rolling-month-to-date.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -24,33 +25,38 @@ jobs:
           p = Path('index.html')
           text = p.read_text()
 
+          anchor = "function weekBounds(d=new Date()){const w=currentCampaignWeek(d),m=monthBounds(d),startDay=w===1?1:w===2?8:w===3?15:22;return {start:new Date(d.getFullYear(),d.getMonth(),startDay),end:w===4?m.end:new Date(d.getFullYear(),d.getMonth(),startDay+7)};}"
+          addition = anchor + "\n  function monthToDateDrawBounds(d=new Date()){const w=currentCampaignWeek(d),m=monthBounds(d),end=w===1?new Date(d.getFullYear(),d.getMonth(),8):w===2?new Date(d.getFullYear(),d.getMonth(),15):w===3?new Date(d.getFullYear(),d.getMonth(),22):m.end;return {start:m.start,end};}"
+          if 'function monthToDateDrawBounds(' not in text:
+              if anchor not in text:
+                  raise SystemExit('weekBounds anchor not found')
+              text = text.replace(anchor, addition, 1)
+
           old = "function eligibleEntries(){const wonPhones=wonPhonesThisMonth(),week=currentCampaignWeek(),period=week===4?monthBounds():weekBounds(),verified=state.entries.filter(x=>x.status==='verified'&&!wonPhones.has(x.phone));let qualifyingPhones=null;if(week===4){const totals=new Map();verified.forEach(x=>totals.set(x.phone,(totals.get(x.phone)||0)+overlapDays(x,period.start,period.end)));qualifyingPhones=new Set([...totals].filter(([,days])=>days>=7).map(([phone])=>phone));}return verified.filter(x=>!qualifyingPhones||qualifyingPhones.has(x.phone)).map(x=>({...x,days:overlapDays(x,period.start,period.end)})).filter(x=>x.days>0);}"
-
-          new = "function eligibleEntries(){const wonPhones=wonPhonesThisMonth(),week=currentCampaignWeek(),month=monthBounds(),today=new Date(),cutoff=new Date(Math.min(today.getTime(),month.end.getTime())),verified=state.entries.filter(x=>x.status==='verified'&&!wonPhones.has(x.phone));const monthlyDaysByPhone=new Map();verified.forEach(x=>monthlyDaysByPhone.set(x.phone,(monthlyDaysByPhone.get(x.phone)||0)+overlapDays(x,month.start,cutoff)));let qualifyingPhones=null;if(week===4){qualifyingPhones=new Set([...monthlyDaysByPhone].filter(([,days])=>days>=7).map(([phone])=>phone));}return verified.filter(x=>!qualifyingPhones||qualifyingPhones.has(x.phone)).map(x=>({...x,days:overlapDays(x,month.start,cutoff)})).filter(x=>x.days>0);}"
-
-          if old not in text:
+          new = "function eligibleEntries(){const wonPhones=wonPhonesThisMonth(),week=currentCampaignWeek(),period=monthToDateDrawBounds(),verified=state.entries.filter(x=>x.status==='verified'&&!wonPhones.has(x.phone));let qualifyingPhones=null;if(week===4){const totals=new Map();verified.forEach(x=>totals.set(x.phone,(totals.get(x.phone)||0)+overlapDays(x,period.start,period.end)));qualifyingPhones=new Set([...totals].filter(([,days])=>days>=7).map(([phone])=>phone));}return verified.filter(x=>!qualifyingPhones||qualifyingPhones.has(x.phone)).map(x=>({...x,days:overlapDays(x,period.start,period.end)})).filter(x=>x.days>0);}"
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
               raise SystemExit('eligibleEntries target not found')
-          text = text.replace(old, new)
 
-          text = text.replace(
-              'Each verified stay-day gives you one wheel slot for that week. Once you win, you are removed from every remaining draw that month. The ₦1,000,000 Grand Prize is for guests with at least 7 verified stay-days during the month.',
-              'Every verified stay-day from the beginning of the month keeps counting in each weekly draw. Once you win, you are removed from every remaining draw that month. The ₦1,000,000 Grand Prize is for guests with at least 7 verified stay-days during the month.'
-          )
-
-          text = text.replace(
-              'Weekly wheel slots are calculated from the stay-days that fall inside each campaign week.',
-              'Your wheel slots accumulate from all verified stay-days completed so far this month.'
-          )
-
-          text = text.replace(
-              "note=`Eligible for Week ${currentCampaignWeek()} using stay-days inside this campaign period.`;",
-              "note=`Eligible for Week ${currentCampaignWeek()} using your accumulated verified stay-days this month.`;"
-          )
-
-          text = text.replace(
-              "note='Verified, but this booking has no stay-days inside the current campaign week.';",
-              "note='Verified, but this booking has no completed stay-days in the current month yet.';"
-          )
+          replacements = {
+            'Each verified stay-day gives you one wheel slot for that campaign week. Once a guest wins, that guest is removed from the remaining draws for the month. The ₦1,000,000 Grand Prize requires at least 7 verified stay-days during the month.':
+            'Every verified stay-day from the beginning of the month keeps counting in each weekly draw. Once a guest wins, that guest is removed from the remaining draws for the month. The ₦1,000,000 Grand Prize requires at least 7 verified stay-days during the month.',
+            'Weekly wheel slots are calculated from the stay-days that fall inside each campaign week.':
+            'Your wheel slots accumulate from all verified stay-days in the month up to the current draw period.',
+            "note=`Eligible for Week ${currentCampaignWeek()} using stay-days inside this campaign period.`;":
+            "note=`Eligible for Week ${currentCampaignWeek()} using your accumulated verified stay-days this month.`;",
+            "note='Verified, but this booking has no stay-days inside the current campaign week.';":
+            "note='Verified, but this booking has no stay-days inside the current month-to-date draw period.';",
+            "`${state.entries.length} booking${state.entries.length===1?'':'s'} · ${eligibleGuestCount()} eligible this week`":
+            "`${state.entries.length} booking${state.entries.length===1?'':'s'} · ${eligibleGuestCount()} eligible this draw`",
+            "'No eligible wheel slots for the current campaign week'":
+            "'No eligible wheel slots for the current month-to-date draw'",
+            "return alert('There are no eligible wheel slots for this week.');":
+            "return alert('There are no eligible month-to-date wheel slots for this draw.');"
+          }
+          for a,b in replacements.items():
+              text = text.replace(a,b)
 
           p.write_text(text)
           PY
